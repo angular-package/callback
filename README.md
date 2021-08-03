@@ -90,10 +90,10 @@ Run `ng test callback` to execute the unit tests via [Karma](https://karma-runne
 
 ## Installation
 
-Install `@angular-package/component-loader` package with command:
+Install `@angular-package/callback` package with command:
 
 ```bash
-npm i --save @angular-package/component-loader
+npm i --save @angular-package/callback
 ```
 
 <br>

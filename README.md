@@ -181,7 +181,7 @@ The **return value** is a [`function`][js-function] of a [`ResultCallback`][pack
 
 ```typescript
 // Example usage.
-import { Callback } from '@angular-package/core';
+import { Callback } from '@angular-package/callback';
 import { is } from '@angular-package/type';
 
 const stringCallback = Callback.defineCallback(
@@ -233,7 +233,7 @@ The **return value** is a [`function`][js-function] of a [`ResultCallback`][pack
 
 ```typescript
 // Example usage.
-import { Callback } from '@angular-package/core';
+import { Callback } from '@angular-package/callback';
 import { is } from '@angular-package/type';
 
 const stringCallback = Callback.defineErrorCallback('Something went wrong');
@@ -272,7 +272,7 @@ The **return value** is a boolean indicating whether the provided `resultCallbac
 
 ```typescript
 // Example usage.
-import { Callback } from '@angular-package/core';
+import { Callback } from '@angular-package/callback';
 
 Callback.guard(result => result); // Returns `true`.
 Callback.guard({} as any); // Returns `false`.
@@ -318,7 +318,7 @@ The **return value** is a `boolean` indicating whether the `value` is an instanc
 
 ```typescript
 // Example usage.
-import { Callback } from '@angular-package/core';
+import { Callback } from '@angular-package/callback';
 
 Callback.isCallback({}); // Returns `false`
 Callback.isCallback(new Callback()); // Returns `true`
@@ -368,7 +368,7 @@ The **return value** is new instance of a [`Callback`](#callback).
 
 ```typescript
 // Example usage.
-import { Callback } from '@angular-package/core';
+import { Callback } from '@angular-package/callback';
 
 const callback = new Callback(['set', 'define']);
 ```
@@ -413,7 +413,7 @@ The **return value** is the callback `function` of a [`ResultCallback`][package-
 
 ```typescript
 // Example usage.
-import { Callback } from '@angular-package/core';
+import { Callback } from '@angular-package/callback';
 /**
  * Initialize `Callback`.
  */
@@ -467,7 +467,7 @@ The **return value** is an instance of [`Callback`](#callback).
 
 ```typescript
 // Example usage.
-import { Callback } from '@angular-package/core';
+import { Callback } from '@angular-package/callback';
 /**
  * Initialize `Callback`.
  */
@@ -520,7 +520,7 @@ The **return value** is an instance of [`Callback`](#callback).
 
 ```typescript
 // Example usage.
-import { Callback } from '@angular-package/core';
+import { Callback } from '@angular-package/callback';
 /**
  * Initialize `Callback`.
  */

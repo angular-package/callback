@@ -66,9 +66,9 @@ Sets
 > Sets the existing given value in the `object`.
 
 Defines
-> Returns defined value from the method of the `object`.
-> Defines the new value in the `object`.
-> Both above at the same time.
+> Returns defined value from the method of the `object`.  
+> Defines the new value in the `object`.  
+> Both above at the same time.  
 
 <br>
 
@@ -569,7 +569,7 @@ How do I know when to release 1.0.0?
 
 ## License
 
-MIT © angular-package ([license][core-license])
+MIT © angular-package ([license][callback-license])
 
 <!-- Funding -->
 [github-badge-sponsor]: https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&link=https://github.com/sponsors/angular-package

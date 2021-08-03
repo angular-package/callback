@@ -595,15 +595,15 @@ MIT © angular-package ([license][core-license])
 
 <!-- Package: callback  -->
   <!-- GitHub: badges -->
-  [callback-badge-issues]: https://img.shields.io/github/issues/angular-package/component-loader
-  [callback-badge-forks]: https://img.shields.io/github/forks/angular-package/component-loader
-  [callback-badge-stars]: https://img.shields.io/github/stars/angular-package/component-loader
-  [callback-badge-license]: https://img.shields.io/github/license/angular-package/component-loader
+  [callback-badge-issues]: https://img.shields.io/github/issues/angular-package/callback
+  [callback-badge-forks]: https://img.shields.io/github/forks/angular-package/callback
+  [callback-badge-stars]: https://img.shields.io/github/stars/angular-package/callback
+  [callback-badge-license]: https://img.shields.io/github/license/angular-package/callback
   <!-- GitHub: badges links -->
-  [callback-issues]: https://github.com/angular-package/component-loader/issues
-  [callback-forks]: https://github.com/angular-package/component-loader/network
-  [callback-license]: https://github.com/angular-package/component-loader/blob/master/LICENSE
-  [callback-stars]: https://github.com/angular-package/component-loader/stargazers
+  [callback-issues]: https://github.com/angular-package/callback/issues
+  [callback-forks]: https://github.com/angular-package/callback/network
+  [callback-license]: https://github.com/angular-package/callback/blob/master/LICENSE
+  [callback-stars]: https://github.com/angular-package/callback/stargazers
 
 <!-- Package: callback -->
   <!-- npm -->

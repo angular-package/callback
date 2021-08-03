@@ -146,9 +146,7 @@ Manages the callback [`function`][js-function] of a [`ResultCallback`][package-t
 
 ## `Callback` static methods
 
-----
-
-## `Callback.defineCallback()`
+### `Callback.defineCallback()`
 
 Defines the [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type that contains a [`ResultHandler`](#resulthandler) function to handle the result and the provided value of its check.
 
@@ -199,7 +197,7 @@ is.string(5, stringCallback);
 
 <br>
 
-## `Callback.defineErrorCallback()`
+### `Callback.defineErrorCallback()`
 
 Defines the [`function`][js-function] of [`ResultCallback`][package-type-resultcallback] type to throw [`ValidationError`](#validationerror) with a specified message on a state from the `throwOnState`.
 
@@ -244,7 +242,7 @@ is.string(5, stringCallback); // Throws ValidationError: Something went wrong
 
 <br>
 
-## `Callback.guard()`
+### `Callback.guard()`
 
 Guards the provided `resultCallback` to be [`ResultCallback`][package-type-resultcallback] type.
 
@@ -282,7 +280,7 @@ Callback.guard({} as any); // Returns `false`.
 
 <br>
 
-## `Callback.isCallback()`
+### `Callback.isCallback()`
 
 Checks if the provided `value` is an instance of [`Callback`](#callback) with optional indicating allowed names under which callback functions can be stored
 
@@ -338,9 +336,7 @@ if (Callback.isCallback(callback, 'one', 'two')) {
 
 ## `Callback` constructor
 
-----
-
-## `Callback()`
+### `Callback()`
 
 Initialize an instance of a [`Callback`](#callback) with the allowed names under which callback functions can be stored.
 
@@ -381,9 +377,7 @@ const callback = new Callback(['set', 'define']);
 
 ## `Callback` instance methods
 
-----
-
-## `Callback.prototype.getCallback()`
+### `Callback.prototype.getCallback()`
 
 Gets from the storage specified by-name callback [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type.
 
@@ -432,7 +426,7 @@ callback
 
 <br>
 
-## `Callback.prototype.setCallback()`
+### `Callback.prototype.setCallback()`
 
 Sets the callback function of a [`ResultCallback`][package-type-resultcallback] type to the storage under the given allowed `name` restricted by `AllowNames`.
 
@@ -485,7 +479,7 @@ callback
 
 <br>
 
-## `Callback.prototype.setErrorCallback`
+### `Callback.prototype.setErrorCallback`
 
 Sets a [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type to the storage under the given allowed name with the given error message to throw on the specified state from the `throwOnState`.
 

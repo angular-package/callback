@@ -557,29 +557,27 @@ Default shape of the callback payload of a generic `Payload`.
 
 ```typescript
 export interface CallbackPayload {
-  /**
-   * Action that describes performed callback.
-   */
   action?: string;
-  /**
-   * Name of the function or method.
-   */
   name?: string;
-
-  /**
-   * Name of the parameter to which it relates.
-   */
   param?: string;
-
-  /**
-   * The value of related parameter.
-   */
-  value?: string;
-
+  value?: any;
   [index: string]: any;
 }
-
 ```
+
+**Properties:**
+
+**`action`**  
+An optional action that describes the cause of performed callback.
+
+**`name`**  
+An optional name of the [`function`][js-function] or method that performed callback.
+
+**`param`**  
+An optional name of the parameter of a [`string`][js-string] type to which performed callback relates.
+
+**`value`**  
+An optional value of of related parameter of any type.
 
 <br>
 

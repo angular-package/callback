@@ -121,8 +121,8 @@ Manages the callback [`function`][js-function] of a [`ResultCallback`](#resultca
 
 | Callback.                                                 | Description |
 | :-------------------------------------------------------- | :---------- |
-| [`defineResultCallback()`](#callbackdefineresultcallback) | Defines the [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that contains a [`ResultHandler`](#resulthandler) function to handle the result and the provided value of its check |
-| [`defineErrorCallback()`](#callbackdefineerrorcallback)   | Defines the [`function`][js-function] of [`ResultCallback`](#resultcallback) type to throw [`ValidationError`](#validationerror) with a specified message on a state from the `throwOnState` |
+| [`defineResultCallback()`](#callbackdefineresultcallback) | Defines the [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that contains a [`ResultHandler`](#resulthandler) function to handle the `result` and the provided `payload` of its check |
+| [`defineErrorCallback()`](#callbackdefineerrorcallback)   | Defines the [`function`][js-function] of [`ResultCallback`](#resultcallback) type to throw [`ValidationError`][error-validationerror] with a specified message on a state from the `throwOnState` |
 | [`guard()`](#callbackguard)                               | Guards the provided `resultCallback` to be [`ResultCallback`](#resultcallback) type |
 | [`isCallback()`](#callbackiscallback)                     | Checks if the provided `value` is an instance of [`Callback`](#callback) with optional indicating allowed names under which callback functions can be stored |
 
@@ -152,7 +152,7 @@ Manages the callback [`function`][js-function] of a [`ResultCallback`](#resultca
 
 #### `Callback.defineResultCallback()`
 
-Defines the [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that contains a [`ResultHandler`](#resulthandler) function to handle the result and optional `payload`.
+Defines the [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that contains a [`ResultHandler`](#resulthandler) function to handle the `result` and optional `payload`.
 
 ```typescript
 static defineResultCallback<Payload extends object>(
@@ -172,19 +172,20 @@ static defineResultCallback<Payload extends object>(
 
 | Name                     | Description |
 | :----------------------- | :---------- |
-| `Payload extends object` | A generic `Payload` variable that is constrained by the [`object`][js-object] type and is used by the `payload` of `ResultCallback`, and is linked with the return type `value is Callback<AllowNames>`. By default, its value is captured from the provided `allowNames` rest parameter  |
+| `Payload extends object` | A generic `Payload` variable that is constrained by the [`object`][js-object] type, it is used by the `resultHandler` parameter, and is linked with the return type `ResultCallback<Payload>`. Its value can be captured from the provided `capturePayload` optional parameter  |
 
 **Parameters:**
 
-| Name: type                     | Description |
-| :----------------------------- | :---------- |
-| `resultHandler: ResultHandler` | The [`function`][js-function] of [`ResultHandler`](#resulthandler) type to handle the `value` and the `result` of the check |
+| Name: type                              | Description |
+| :-------------------------------------- | :---------- |
+| `resultHandler: ResultHandler<Payload>` | The [`function`][js-function] of [`ResultHandler`](#resulthandler) type to handle the `result` and optional `payload` |
+| `capturePayload?: Payload`              | An optional [`object`][js-object] that is used to capture the type of the generic type variable `Payload` |
 
 **Returns:**
 
-| Returns          | Type       | Description  |
-| :--------------- | :--------: | :----------- |
-| `ResultCallback` | `Function` | The **return type** is a [`function`][js-function] of a [`ResultCallback`](#resultcallback) type |
+| Returns                   | Type       | Description  |
+| :------------------------ | :--------: | :----------- |
+| `ResultCallback<Payload>` | `Function` | The **return type** is a [`function`][js-function] of [`ResultCallback`](#resultcallback) |
 
 The **return value** is a [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that contains a [`function`][js-function] of [`ResultHandler`](#resulthandler).
 
@@ -195,42 +196,75 @@ The **return value** is a [`function`][js-function] of a [`ResultCallback`](#res
 import { Callback } from '@angular-package/callback';
 import { is } from '@angular-package/type';
 
-const stringCallback = Callback.defineCallback(
-  (result: boolean, value: any) => {
+const stringCallback = Callback.defineResultCallback(
+  (result: boolean, payload) => {
     if (is.false(result)) {
-      console.log(`Something went wrong`);
+      console.log(`Something went wrong`, payload);
     }
   }
 );
 
+// Returns in console 'Something went wrong' 5
 is.string(5, stringCallback);
+```
+
+```typescript
+// Another usage example.
+import { Callback, ResultCallback } from '@angular-package/callback';
+
+type Person = { id?: number; firstName?: string; age?: number };
+
+const isPerson = (value: Person, callback: ResultCallback<Person>): any =>
+  callback(typeof value === 'object', value);
+
+const personCallback = Callback.defineResultCallback(
+  (result: boolean, payload) => {
+    if (payload !== undefined) {
+      console.log(payload);
+    }
+    return result;
+  }
+);
+
+isPerson({ firstName: 'My name' }, personCallback);
 ```
 
 <br>
 
 #### `Callback.defineErrorCallback()`
 
-Defines the [`function`][js-function] of [`ResultCallback`](#resultcallback) type to throw [`ValidationError`](#validationerror) with a specified message on a state from the `throwOnState`.
+Defines the [`function`][js-function] of [`ResultCallback`](#resultcallback) type to throw [`ValidationError`][error-validationerror] with a specified message on a state from the `throwOnState`.
+Provided `payload` from the defined callback function of [`ResultCallback`](#resultcallback) is being passed to the thrown error of [`ValidationError`][error-validationerror].
 
 ```typescript
-static defineErrorCallback(
+static defineErrorCallback<Payload extends object>(
   message: string | ErrorMessage,
-  throwOnState: boolean = false
-): ResultCallback {
-  return Callback.defineCallback((result: boolean, value: any): void => {
-    if (is.false(throwOnState) ? is.false(result) : is.true(result)) {
-      throw new ValidationError(message);
+  throwOnState: boolean = false,
+  capturePayload?: Payload
+): ResultCallback<Payload> {
+  return Callback.defineResultCallback<Payload>(
+    (result: boolean, payload?: Payload): void => {
+      if (is.false(throwOnState) ? is.false(result) : is.true(result)) {
+        throw Object.assign(new ValidationError(message), { payload });
+      }
     }
-  });
+  );
 }
 ```
+
+**Generic type variables:***
+
+| Name                     | Description |
+| :----------------------- | :---------- |
+| `Payload extends object` | A generic `Payload` variable that is constrained by the [`object`][js-object] type, and is linked with the return type `ResultCallback<Payload>`. Its value can be captured from the provided `capturePayload` optional parameter  |
 
 **Parameters:**
 
 | Name: type                        | Description |
 | :-------------------------------- | :---------- |
-| `message: string \| ErrorMessage` | The message of string type or [`ErrorMessage`](#errormessage) interface, to throw with an error of [`ValidationError`](#validationerror) |
-| `throwOnState: boolean`           | A state of [`boolean`][js-boolean] type on which an error of [`ValidationError`](#validationerror) should be thrown. By default, it's set to `false` |
+| `message: string \| ErrorMessage` | The message of string type or [`ErrorMessage`](#errormessage) interface, to throw with an error of [`ValidationError`][error-validationerror] |
+| `throwOnState: boolean`           | A state of [`boolean`][js-boolean] type on which an error of [`ValidationError`][error-validationerror] should be thrown. By default, it's set to `false` |
+| `capturePayload?: Payload`        | An optional [`object`][js-object] that is used to capture the type of the generic type variable `Payload` |
 
 **Returns:**
 
@@ -238,7 +272,7 @@ static defineErrorCallback(
 | :--------------- | :--------: | :----------- |
 | `ResultCallback` | `Function` | The **return type** is a [`function`][js-function] of a [`ResultCallback`](#resultcallback) type |
 
-The **return value** is a [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that throws a [`ValidationError`](#validationerror) on a specified state.
+The **return value** is a [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that throws a [`ValidationError`][error-validationerror] on a specified state.
 
 **Usage:**
 
@@ -249,6 +283,24 @@ import { is } from '@angular-package/type';
 
 const stringCallback = Callback.defineErrorCallback('Something went wrong');
 is.string(5, stringCallback); // Throws ValidationError: Something went wrong
+```
+
+```typescript
+import { Callback, ResultCallback } from '@angular-package/callback';
+
+type Person = { id?: number; firstName?: string; age?: number };
+
+const isPerson = (value: Person, callback: ResultCallback<Person>): any =>
+  callback(typeof value === 'object', value);
+
+const personCallback = Callback.defineErrorCallback('It is not a person', true);
+
+try {
+  isPerson({ id: 1, firstName: 'name', age: 27 }, personCallback);
+} catch (e) {
+  // Console returns {id: 1, firstName: "name", age: 27}
+  console.log(e.payload);
+}
 ```
 
 <br>
@@ -275,7 +327,7 @@ static guard(
 
 | Returns                            | Type      | Description  |
 | :--------------------------------- | :-------: | :----------- |
-| `resultCallback is ResultCallback` | `boolean` | The **return type** is boolean, as the result of its statement that indicates the provided `resultCallback` is the [`function`][js-function] of a [`ResultCallback`](#resultcallback) type |
+| `resultCallback is ResultCallback` | `boolean` | The **return type** is [`boolean`][js-boolean], as the result of its statement that indicates the provided `resultCallback` is the [`function`][js-function] of a [`ResultCallback`](#resultcallback) type |
 
 The **return value** is a boolean indicating whether the provided `resultCallback` parameter is a [`function`][js-function].
 
@@ -520,8 +572,8 @@ public setErrorCallback<Name extends AllowNames>(
 | Name: type                        | Description |
 | :-------------------------------- | :---------- |
 | `name: Name`                      | A `string` type name that is restricted by the `AllowNames` under which the [`function`][js-function] is stored. The allowed status of the provided `name` is checked by the private method `isNameAllowed()` |
-| `message: string \| ErrorMessage` | The message of string type or [`ErrorMessage`](#errormessage) interface, to throw with an error of [`ValidationError`](#validationerror) |
-| `throwOnState: boolean`           | A state of [`boolean`][js-boolean] type on which an error of [`ValidationError`](#validationerror) should be thrown. By default, it's set to `false` |
+| `message: string \| ErrorMessage` | The message of string type or [`ErrorMessage`](#errormessage) interface, to throw with an error of [`ValidationError`][error-validationerror] |
+| `throwOnState: boolean`           | A state of [`boolean`][js-boolean] type on which an error of [`ValidationError`][error-validationerror] should be thrown. By default, it's set to `false` |
 
 **Returns:**
 
@@ -567,17 +619,66 @@ export interface CallbackPayload {
 
 **Properties:**
 
-**`action`**  
+**`action?: string`**  
 An optional action that describes the cause of performed callback.
 
-**`name`**  
+**`name?: string`**  
 An optional name of the [`function`][js-function] or method that performed callback.
 
-**`param`**  
+**`param?: string`**  
 An optional name of the parameter of a [`string`][js-string] type to which performed callback relates.
 
-**`value`**  
+**`value?: any`**  
 An optional value of of related parameter of any type.
+
+**Usage:**
+
+```typescript
+// Example usage.
+import { CallbackPayload, ResultCallback } from '@angular-package/callback';
+
+// Create a new function.
+const isString = (
+  value: any,
+
+  // Parameter callback of `ResultCallback` type with the `CallbackPayload`.
+  callback: ResultCallback<CallbackPayload>
+): any => {
+  callback(typeof value === 'string', {
+    // Property from the `CallbackPayload`.
+    action: 'Checks the string of a firstName',
+
+    // Property from the `CallbackPayload`.
+    name: 'isString',
+
+    // Property from the `CallbackPayload`.
+    param: 'value',
+
+    // Property from the `CallbackPayload`.
+    value,
+
+    // Custom property.
+    firstName: 'my Name',
+  });
+};
+
+// The use of the `isString()` function.
+isString('it is a string', (result: boolean, payload) => {
+  if (payload !== undefined) {
+    /*
+    Returns {
+      action: "Checks the string of a firstName",
+      firstName: "my Name",
+      name: "isString",
+      param: "value",
+      value: "it is a string",
+    }
+    */
+    console.log(payload);
+  }
+  return result;
+});
+```
 
 <br>
 
@@ -587,13 +688,34 @@ An optional value of of related parameter of any type.
 
 #### `ResultCallback`
 
-Callback function with parameters, a `result` of a `boolean` type, and optional `payload` of a generic `Payload` type.
+Represents a callback function with parameters, a `result` of a [`boolean`][js-boolean] type, and an optional `payload` of a generic `Payload` type.
 
 ```typescript
-export type ResultCallback<Payload extends object = any> = (
+type ResultCallback<Payload extends object = any> = (
   result: boolean,
   payload?: Payload
 ) => boolean;
+```
+
+**Parameters:**
+
+**`result: boolean`**  
+Result of the callback.
+
+**`result: boolean`**  
+An optional object to provide more data.
+
+<br>
+
+#### `ResultHandler`
+
+Function to handle the `result` and optional `payload` of the [`ResultCallback`](#resultcallback) function before its result returns.
+
+```typescript
+type ResultHandler<Payload extends object = any> = (
+  result: boolean,
+  payload?: Payload
+) => void;
 ```
 
 <br>
@@ -709,6 +831,8 @@ MIT © angular-package ([license][callback-license])
 
   <!-- GitHub -->
   [error-github-readme]: https://github.com/angular-package/error#readme
+
+  [error-validationerror]: https://github.com/angular-package/error#validationerror
 
 <!-- Package: prism -->
   <!-- npm -->

@@ -121,7 +121,7 @@ Manages the callback [`function`][js-function] of a [`ResultCallback`](#resultca
 
 | Callback.                                                 | Description |
 | :-------------------------------------------------------- | :---------- |
-| [`defineResultCallback()`](#callbackdefineresultcallback) | Defines the [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that contains a [`ResultHandler`](#resulthandler) function to handle the `result` and the provided `payload` of its check |
+| [`defineResultCallback()`](#callbackdefineresultcallback) | Defines the [`function`][js-function] of [`ResultCallback`](#resultcallback) type that contains a [`ResultHandler`](#resulthandler) function to handle the `result` and optional `payload` |
 | [`defineErrorCallback()`](#callbackdefineerrorcallback)   | Defines the [`function`][js-function] of [`ResultCallback`](#resultcallback) type to throw [`ValidationError`][error-validationerror] with a specified message on a state from the `throwOnState` |
 | [`guard()`](#callbackguard)                               | Guards the provided `resultCallback` to be [`ResultCallback`](#resultcallback) type |
 | [`isCallback()`](#callbackiscallback)                     | Checks if the provided `value` is an instance of [`Callback`](#callback) with optional indicating allowed names under which callback functions can be stored |
@@ -137,8 +137,8 @@ Manages the callback [`function`][js-function] of a [`ResultCallback`](#resultca
 | Callback.prototype.                               | Description |
 | :------------------------------------------------ | :---------- |
 | [`getCallback()`][callback-getcallback]           | Gets from the storage specified by-name callback [`function`][js-function] of a [`ResultCallback`](#resultcallback) type |
-| [`setResultCallback()`][callback-setcallback]     | Sets the callback [`function`][js-function] of a [`ResultCallback`](#resultcallback) type to the storage under the given allowed `name` restricted by `AllowNames` |
-| [`setErrorCallback()`][callback-seterrorcallback] | Sets a [`function`][js-function] of a [`ResultCallback`](#resultcallback) type to the storage under the given allowed name with the given error message to throw on the specified state from the `throwOnState` |
+| [`setResultCallback()`][callback-setcallback]     | Sets a callback [`function`][js-function] of a [`ResultCallback`](#resultcallback) type to the storage under the given allowed `name`, which is restricted by `AllowNames` |
+| [`setErrorCallback()`][callback-seterrorcallback] | Sets a callback [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that throws [`ValidationError`][error-validationerror] with a specified message on a state from the provided `throwOnState` to the storage under the given allowed name restricted by `AllowNames` |
 
 [callback-getcallback]: #callbackprototypegetcallback
 [callback-setcallback]: #callbackprototypesetcallback
@@ -781,7 +781,7 @@ MIT © angular-package ([license][callback-license])
 [git-commit-karma]: http://karma-runner.github.io/0.10/dev/git-commit-msg.html
 [git-commit-conventional]: https://www.conventionalcommits.org/en/v1.0.0/
 
-<!-- Package: callback  -->
+<!-- This package: callback  -->
   <!-- GitHub: badges -->
   [callback-badge-issues]: https://img.shields.io/github/issues/angular-package/callback
   [callback-badge-forks]: https://img.shields.io/github/forks/angular-package/callback
@@ -793,9 +793,12 @@ MIT © angular-package ([license][callback-license])
   [callback-license]: https://github.com/angular-package/callback/blob/master/LICENSE
   [callback-stars]: https://github.com/angular-package/callback/stargazers
 
+<!-- This package -->
+
 <!-- Package: callback -->
   <!-- npm -->
   [callback-npm-badge-svg]: https://badge.fury.io/js/%40angular-package%2Fcallback.svg
+  [callback-npm-badge-png]: https://badge.fury.io/js/%40angular-package%2Fcallback.png
   [callback-npm-badge]: https://badge.fury.io/js/%40angular-package%2Fcallback
   [callback-npm-readme]: https://www.npmjs.com/package/@angular-package/callback#readme
 
@@ -805,6 +808,7 @@ MIT © angular-package ([license][callback-license])
 <!-- Package: change-detection -->
   <!-- npm -->
   [cd-npm-badge-svg]: https://badge.fury.io/js/%40angular-package%2Fchange-detection.svg
+  [cd-npm-badge-png]: https://badge.fury.io/js/%40angular-package%2Fchange-detection.png
   [cd-npm-badge]: https://badge.fury.io/js/%40angular-package%2Fchange-detection
   [cd-npm-readme]: https://www.npmjs.com/package/@angular-package/change-detection#readme
 
@@ -814,6 +818,7 @@ MIT © angular-package ([license][callback-license])
 <!-- Package: component-loader -->
   <!-- npm -->
   [cl-npm-badge-svg]: https://badge.fury.io/js/%40angular-package%2Fcomponent-loader.svg
+  [cl-npm-badge-png]: https://badge.fury.io/js/%40angular-package%2Fcomponent-loader.png
   [cl-npm-badge]: https://badge.fury.io/js/%40angular-package%2Fcomponent-loader
   [cl-npm-readme]: https://www.npmjs.com/package/@angular-package/component-loader#readme
 
@@ -823,6 +828,7 @@ MIT © angular-package ([license][callback-license])
 <!-- Package: core -->
   <!-- npm -->
   [core-npm-badge-svg]: https://badge.fury.io/js/%40angular-package%2Fcore.svg
+  [core-npm-badge-png]: https://badge.fury.io/js/%40angular-package%2Fcore.png
   [core-npm-badge]: https://badge.fury.io/js/%40angular-package%2Fcore
   [core-npm-readme]: https://www.npmjs.com/package/@angular-package/core#readme
 
@@ -832,17 +838,17 @@ MIT © angular-package ([license][callback-license])
 <!-- Package: error -->
   <!-- npm -->
   [error-npm-badge-svg]: https://badge.fury.io/js/%40angular-package%2Ferror.svg
+  [error-npm-badge-png]: https://badge.fury.io/js/%40angular-package%2Ferror.png
   [error-npm-badge]: https://badge.fury.io/js/%40angular-package%2Ferror
   [error-npm-readme]: https://www.npmjs.com/package/@angular-package/error#readme
 
   <!-- GitHub -->
   [error-github-readme]: https://github.com/angular-package/error#readme
 
-  [error-validationerror]: https://github.com/angular-package/error#validationerror
-
 <!-- Package: prism -->
   <!-- npm -->
   [prism-npm-badge-svg]: https://badge.fury.io/js/%40angular-package%2Fprism.svg
+  [prism-npm-badge-png]: https://badge.fury.io/js/%40angular-package%2Fprism.png
   [prism-npm-badge]: https://badge.fury.io/js/%40angular-package%2Fprism
   [prism-npm-readme]: https://www.npmjs.com/package/@angular-package/prism#readme
 
@@ -852,6 +858,7 @@ MIT © angular-package ([license][callback-license])
 <!-- Package: property -->
   <!-- npm -->
   [property-npm-badge-svg]: https://badge.fury.io/js/%40angular-package%2Fproperty.svg
+  [property-npm-badge-png]: https://badge.fury.io/js/%40angular-package%2Fproperty.png
   [property-npm-badge]: https://badge.fury.io/js/%40angular-package%2Fproperty
   [property-npm-readme]: https://www.npmjs.com/package/@angular-package/property#readme
 
@@ -861,6 +868,7 @@ MIT © angular-package ([license][callback-license])
 <!-- Package: reactive -->
   <!-- npm -->
   [reactive-npm-badge-svg]: https://badge.fury.io/js/%40angular-package%2Freactive.svg
+  [reactive-npm-badge-png]: https://badge.fury.io/js/%40angular-package%2Freactive.png
   [reactive-npm-badge]: https://badge.fury.io/js/%40angular-package%2Freactive
   [reactive-npm-readme]: https://www.npmjs.com/package/@angular-package/reactive#readme
 
@@ -870,6 +878,7 @@ MIT © angular-package ([license][callback-license])
 <!-- Package: testing -->
   <!-- npm -->
   [testing-npm-badge-svg]: https://badge.fury.io/js/%40angular-package%2Ftesting.svg
+  [testing-npm-badge-png]: https://badge.fury.io/js/%40angular-package%2Ftesting.png
   [testing-npm-badge]: https://badge.fury.io/js/%40angular-package%2Ftesting
   [testing-npm-readme]: https://www.npmjs.com/package/@angular-package/testing#readme
 
@@ -879,6 +888,7 @@ MIT © angular-package ([license][callback-license])
 <!-- Package: type -->
   <!-- npm -->
   [type-npm-badge-svg]: https://badge.fury.io/js/%40angular-package%2Ftype.svg
+  [type-npm-badge-png]: https://badge.fury.io/js/%40angular-package%2Ftype.png
   [type-npm-badge]: https://badge.fury.io/js/%40angular-package%2Ftype
   [type-npm-readme]: https://www.npmjs.com/package/@angular-package/type#readme
 
@@ -890,6 +900,7 @@ MIT © angular-package ([license][callback-license])
 
 <!-- Package: ui -->
   <!-- npm -->
+  [ui-npm-badge-svg]: https://badge.fury.io/js/%40angular-package%2Fui.svg
   [ui-npm-badge-svg]: https://badge.fury.io/js/%40angular-package%2Fui.svg
   [ui-npm-badge]: https://badge.fury.io/js/%40angular-package%2Fui
   [ui-npm-readme]: https://www.npmjs.com/package/@angular-package/ui#readme

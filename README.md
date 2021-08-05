@@ -168,11 +168,11 @@ static defineResultCallback<Payload extends object>(
 }
 ```
 
-**Generic type variables:***
+**Generic type variables:**
 
 | Name                     | Description |
 | :----------------------- | :---------- |
-| `Payload extends object` | A generic `Payload` variable that is constrained by the [`object`][js-object] type, it is used by the `resultHandler` parameter, and is linked with the return type `ResultCallback<Payload>`. Its value can be captured from the provided `capturePayload` optional parameter  |
+| `Payload extends object` | A generic `Payload` variable that is constrained by the [`object`][js-object] type, is used by the type of `resultHandler` parameter and is linked with the return type `ResultCallback<Payload>`. Its value can be captured from the provided `capturePayload` optional parameter  |
 
 **Parameters:**
 
@@ -252,11 +252,11 @@ static defineErrorCallback<Payload extends object>(
 }
 ```
 
-**Generic type variables:***
+**Generic type variables:**
 
 | Name                     | Description |
 | :----------------------- | :---------- |
-| `Payload extends object` | A generic `Payload` variable that is constrained by the [`object`][js-object] type, and is linked with the return type `ResultCallback<Payload>`. Its value can be captured from the provided `capturePayload` optional parameter  |
+| `Payload extends object` | A generic `Payload` variable that is constrained by the [`object`][js-object] type and is linked with the return type `ResultCallback<Payload>`. Its value can be captured from the provided `capturePayload` optional parameter  |
 
 **Parameters:**
 
@@ -310,24 +310,30 @@ try {
 Guards the provided `resultCallback` to be [`ResultCallback`](#resultcallback) type.
 
 ```typescript
-static guard(
-  resultCallback: ResultCallback
-): resultCallback is ResultCallback {
+static guard<Payload extends object>(
+  resultCallback: ResultCallback<Payload>
+): resultCallback is ResultCallback<Payload> {
   return guard.function(resultCallback);
 }
 ```
 
+**Generic type variables:**
+
+| Name                     | Description |
+| :----------------------- | :---------- |
+| `Payload extends object` | A generic `Payload` variable that is constrained by the [`object`][js-object] type, is used by the type of `resultCallback` parameter and is linked with the return type `resultCallback is ResultCallback<Payload>`. Its value can be captured from the provided `capturePayload` optional parameter  |
+
 **Parameters:**
 
-| Name: type                       | Description |
-| :------------------------------- | :---------- |
-| `resultCallback: ResultCallback` | The [`function`][js-function] of [`ResultCallback`](#resultcallback), to guard |
+| Name: type                                | Description |
+| :---------------------------------------- | :---------- |
+| `resultCallback: ResultCallback<Payload>` | The [`function`][js-function] of [`ResultCallback`](#resultcallback), to guard |
 
 **Returns:**
 
-| Returns                            | Type      | Description  |
-| :--------------------------------- | :-------: | :----------- |
-| `resultCallback is ResultCallback` | `boolean` | The **return type** is [`boolean`][js-boolean], as the result of its statement that indicates the provided `resultCallback` is the [`function`][js-function] of a [`ResultCallback`](#resultcallback) type |
+| Returns                                     | Type      | Description  |
+| :------------------------------------------ | :-------: | :----------- |
+| `resultCallback is ResultCallback<Payload>` | `boolean` | The **return type** is [`boolean`][js-boolean], as the result of its statement that indicates the provided `resultCallback` is the [`function`][js-function] of a [`ResultCallback`](#resultcallback) type |
 
 The **return value** is a boolean indicating whether the provided `resultCallback` parameter is a [`function`][js-function].
 

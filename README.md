@@ -70,7 +70,7 @@ Gets
 > Returns a value from an object.
 
 Sets
-> Adds or updates an element with a specified key and a value to an object and returns an `object.  
+> Adds or updates an element with a specified key and a value to an object and returns an object.  
 
 <br>
 
@@ -179,7 +179,7 @@ static defineResultCallback<Payload extends object>(
 | Name: type                              | Description |
 | :-------------------------------------- | :---------- |
 | `resultHandler: ResultHandler<Payload>` | The [`function`][js-function] of [`ResultHandler`](#resulthandler) type to handle the `result` and optional `payload` |
-| `capturePayload?: Payload`              | An optional [`object`][js-object] that is used to capture the type of the generic type variable `Payload` |
+| `capturePayload?: Payload`              | An optional [`object`][js-object] that is used to capture the type of generic type variable `Payload` |
 
 **Returns:**
 
@@ -226,6 +226,7 @@ const personCallback = Callback.defineResultCallback(
   }
 );
 
+// Console returns { firstName: 'My name' }
 isPerson({ firstName: 'My name' }, personCallback);
 ```
 
@@ -264,7 +265,7 @@ static defineErrorCallback<Payload extends object>(
 | :-------------------------------- | :---------- |
 | `message: string \| ErrorMessage` | The message of string type or [`ErrorMessage`](#errormessage) interface, to throw with an error of [`ValidationError`][error-validationerror] |
 | `throwOnState: boolean`           | A state of [`boolean`][js-boolean] type on which an error of [`ValidationError`][error-validationerror] should be thrown. By default, it's set to `false` |
-| `capturePayload?: Payload`        | An optional [`object`][js-object] that is used to capture the type of the generic type variable `Payload` |
+| `capturePayload?: Payload`        | An optional [`object`][js-object] that is used to capture the type of generic type variable `Payload` |
 
 **Returns:**
 
@@ -844,6 +845,9 @@ MIT © angular-package ([license][callback-license])
 
   <!-- GitHub -->
   [error-github-readme]: https://github.com/angular-package/error#readme
+
+  <!-- error -->
+  [error-validationerror]: https://github.com/angular-package/error#validationerror
 
 <!-- Package: prism -->
   <!-- npm -->

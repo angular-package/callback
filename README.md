@@ -703,6 +703,11 @@ type ResultCallback<Payload extends object = any> = (
 ) => boolean;
 ```
 
+**Generic type variables:**
+
+**`Payload extends object`**  
+The shape of the optional payload parameter that is constrained by the [`object`][js-object] type.
+
 **Parameters:**
 
 **`result: boolean`**  

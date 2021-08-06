@@ -31,7 +31,10 @@ export class Callback<AllowNames extends string> {
   /**
    * Defines the `function` of `ResultCallback` type that contains a `ResultHandler` function to handle the `result` and optional
    * `payload`.
-   * @param resultHandler The function of `ResultHandler` type to handle the `result` and optional `payload` of `ResultCallback` function.
+   * @var Payload The shape of the optional payload parameter of the `ResultCallback` and `ResultHandler` function, which is constrained by
+   * the `object` type. Its value can be captured from a type of the provided `capturePayload` optional parameter.
+   * @param resultHandler The `function` that is guarded by the `ResultHandler` type to handle the result and optional payload of the
+   * `ResultCallback` function.
    * @param capturePayload An optional `object` of generic type `Payload` that is used only to capture the value by the generic type
    * variable `Payload`.
    * @returns The return value is a function of a `ResultCallback` type that contains a function that handles its result.
@@ -99,7 +102,6 @@ export class Callback<AllowNames extends string> {
   //#endregion
 
   /**
-   * Manages the callback function of a `ResultCallback` type.
    * Initialize an instance of a `Callback` with the allowed names under which callback functions can be stored.
    * @param allowNames A rest parameter of allowed names of a `string` type, under which callback functions can be stored.
    */

@@ -804,7 +804,7 @@ firstNameCallback(false, { id: 5, name: 'there is no name' });
 
 #### `CallbackPayload`
 
-
+![experimental]
 
 Experimental shape for a generic type variable `Payload`.
 
@@ -886,8 +886,6 @@ isString('it is a string', (result: boolean, payload) => {
 ## Type
 
 #### `ResultCallback`
-
-![experimental]
 
 Represents a callback function with parameters, a `result` of a [`boolean`][js-boolean] type, and an optional `payload` of a generic type `Payload`.
 

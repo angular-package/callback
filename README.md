@@ -177,13 +177,13 @@ static defineResultCallback<Payload extends object>(
 
 | Name                     | Description |
 | :----------------------- | :---------- |
-| `Payload extends object` | A generic `Payload` variable that is constrained by the [`object`][js-object] type, is used by the type of `resultHandler` parameter and is linked with the return type `ResultCallback<Payload>`. Its value can be captured from the provided `capturePayload` optional parameter  |
+| `Payload extends object` | The shape of the optional payload parameter of the [`ResultCallback`](#resultcallback) and [`ResultHandler`](#resulthandler) function, which is constrained by the [`object`][js-object] type. Its value can be captured from a type of the provided `capturePayload` optional parameter |
 
 **Parameters:**
 
 | Name: type                              | Description |
 | :-------------------------------------- | :---------- |
-| `resultHandler: ResultHandler<Payload>` | The [`function`][js-function] of [`ResultHandler`](#resulthandler) type to handle the `result` and optional `payload` of [`ResultCallback`](#resultcallback) function |
+| `resultHandler: ResultHandler<Payload>` | The [`function`][js-function] that is guarded by the [`ResultHandler`](#resulthandler) type to handle the result and optional payload of the [`ResultCallback`](#resultcallback) function |
 | `capturePayload?: Payload`              | An optional [`object`][js-object] of generic type `Payload` that is used only to capture the value by the generic type variable `Payload` |
 
 **Returns:**

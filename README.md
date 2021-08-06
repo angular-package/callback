@@ -445,8 +445,10 @@ The **return value** is new instance of a [`Callback`](#callback).
 ```typescript
 // Example usage.
 import { Callback } from '@angular-package/callback';
-
-const callback = new Callback(['set', 'define']);
+/**
+ * Initialize `Callback`.
+ */
+const callback = new Callback('set', 'define');
 ```
 
 <br>

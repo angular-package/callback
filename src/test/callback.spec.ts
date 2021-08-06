@@ -167,21 +167,6 @@ testing.describe(Callback.name, () => {
   });
 
   //#region Callback public methods
-  testing.describe(`.prototype.setCallback()`, () => {
-    testing.it(
-      'should properly sets the callback function under the `setCallback` name',
-      () => {
-        toBe.undefined(callback.getCallback('setCallback'));
-        callback.setResultCallback('setCallback', (result: boolean, value: any) => {
-          if (is.false(result)) {
-            throw new ValidationError('The given value must be a string type');
-          }
-        });
-        toBe.function(callback.getCallback('setCallback'));
-      }
-    );
-  });
-
   testing.describe(`.prototype.getCallback()`, () => {
     try {
       is.string(5, callback.getCallback('setCallback'));
@@ -234,5 +219,21 @@ testing.describe(Callback.name, () => {
       }
     });
   });
+
+  testing.describe(`.prototype.setResultCallback()`, () => {
+    testing.it(
+      'should properly sets the callback function under the `setCallback` name',
+      () => {
+        toBe.undefined(callback.getCallback('setCallback'));
+        callback.setResultCallback('setCallback', (result: boolean, value: any) => {
+          if (is.false(result)) {
+            throw new ValidationError('The given value must be a string type');
+          }
+        });
+        toBe.function(callback.getCallback('setCallback'));
+      }
+    );
+  });
+
   //#endregion
 });

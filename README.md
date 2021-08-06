@@ -108,6 +108,9 @@ npm i @angular-package/callback --save
 import {
   // Class.
   Callback,
+
+  // Type.
+  CallbackPayload
 } from '@angular-package/callback';
 ```
 
@@ -375,7 +378,7 @@ static isCallback<AllowNames extends string>(
 | Name: type                    | Description |
 | :---------------------------- | :---------- |
 | `value: any`                  | The `value` of any type to check |
-| `...allowNames: AllowNames[]` | An optional rest parameter of `AllowNames` that is used only to capture the value by the generic type variable `AllowNames` to indicate allowed names for the `Callback<AllowNames>` return type |
+| `...allowNames: AllowNames[]` | A rest parameter of `AllowNames` that is used only to capture the value by the generic type variable `AllowNames` to indicate allowed names for the `Callback<AllowNames>` return type |
 
 **Returns:**
 
@@ -540,7 +543,7 @@ import { Callback } from '@angular-package/callback';
  */
 const callbackInstance = new Callback('firstName');
 
-// Constant from which is going to be captured type for the payload.
+// Constant from which is going to be captured type for the `Payload`.
 const payLoadToCapture = { id: 1, name: '' };
 
 // Set the callback function under the given name.
@@ -615,8 +618,8 @@ import { Callback } from '@angular-package/callback';
  */
 const callback = new Callback('firstName', 'lastName');
 
-callback
-  .setErrorCallback('lastName', 'LastName must be a string type', false); // Set the error callback function under the given name.
+// Set the error callback function under the given name.
+callback.setErrorCallback('lastName', 'LastName must be a string type', false);
 ```
 
 <br>
@@ -676,19 +679,132 @@ import { Callback } from '@angular-package/callback';
  */
 const callback = new Callback('firstName');
 
-callback
-  .setCallback('firstName', result => result) // Set the callback function under the given name.
+// Set the callback function under the given name.
+callback.setCallback('firstName', result => result) 
+```
+
+```typescript
+// Generic type variable `Payload` example usage.
+import { Callback } from '@angular-package/callback';
+/**
+ * Initialize `Callback`.
+ */
+const callbackInstance = new Callback('firstName');
+
+// Type for the `Payload`.
+type CustomPayload = { id: number; name: string };
+
+// Set the callback function under the given name.
+callbackInstance.setResultCallback<CustomPayload>(
+  'firstName',
+  (result, payload) => {
+    if (payload) {
+      // It handles two properties from the payload.
+      // payload.id
+      // payload.name
+    }
+  }
+);
+```
+
+```typescript
+// Captured `Payload` example usage.
+import { Callback } from '@angular-package/callback';
+/**
+ * Initialize `Callback`.
+ */
+const callbackInstance = new Callback('firstName');
+
+// Constant from which is going to be captured type for the `Payload`.
+const payLoadToCapture = { id: 1, name: '' };
+
+// Set the callback function under the given name.
+callbackInstance.setResultCallback(
+  'firstName',
+  (result, payload) => {
+    if (payload) {
+      // It handles two properties from the payload.
+      // payload.id
+      // payload.name
+    }
+  },
+  payLoadToCapture
+);
+
+```
+
+**Full usage example:**
+
+```typescript
+// Generic type variable `Payload` example usage.
+import { Callback } from '@angular-package/callback';
+/**
+ * Initialize `Callback`.
+ */
+const callbackInstance = new Callback('firstName');
+
+// Type for the `Payload`.
+type CustomPayload = { id: number, name: string };
+
+// Set the callback function under the given name.
+callbackInstance.setResultCallback<CustomPayload>('firstName', (result, payload) => {
+  if (payload) {
+    // It handles two properties from the payload.
+    // payload.id
+    // payload.name
+  }
+});
+
+// Get the function stored under the given name with the `CustomPayload` type.
+const firstNameCallback = callbackInstance.getCallback<CustomPayload>('firstName');
+
+// Use the defined callback function with a defined `CustomPayload`.
+firstNameCallback(false, { id: 5, name: 'there is no name', age: 1 }); // TypeError because of the `age`
+```
+
+```typescript
+// Captured `Payload` example usage.
+import { Callback } from '@angular-package/callback';
+/**
+ * Initialize `Callback`.
+ */
+const callbackInstance = new Callback('firstName');
+
+// Constant from which is going to be captured type for the `Payload`.
+const payLoadToCapture = { id: 1, name: '' };
+
+// Set the callback function under the given name.
+callbackInstance.setResultCallback(
+  'firstName',
+  (result, payload) => {
+    if (payload) {
+      // It handles two properties from the payload.
+      // payload.id
+      // payload.name
+    }
+  },
+  payLoadToCapture
+);
+
+// Get the function stored under the given name.
+const firstNameCallback = callbackInstance.getCallback(
+  'firstName',
+  payLoadToCapture
+);
+
+// Use the defined callback with a captured type of `Payload`.
+firstNameCallback(false, { id: 5, name: 'there is no name' });
 ```
 
 <br>
 
 ## Interface
 
-### Common interfaces
-
 #### `CallbackPayload`
 
-Default shape of the callback payload of a generic `Payload`.
+
+
+Experimental shape for a generic type variable `Payload`.
 
 ```typescript
 export interface CallbackPayload {
@@ -767,9 +883,9 @@ isString('it is a string', (result: boolean, payload) => {
 
 ## Type
 
-### Common types
-
 #### `ResultCallback`
+
+![experimental]
 
 Represents a callback function with parameters, a `result` of a [`boolean`][js-boolean] type, and an optional `payload` of a generic type `Payload`.
 
@@ -854,6 +970,7 @@ MIT © angular-package ([license][callback-license])
 [skeleton]: https://github.com/angular-package/skeleton
 
 <!-- Update status -->
+[experimental]: https://img.shields.io/badge/-experimental-orange
 [fix]: https://img.shields.io/badge/-fix-red
 [new]: https://img.shields.io/badge/-new-green
 [update]: https://img.shields.io/badge/-update-red

@@ -1,16 +1,18 @@
 // @angular-package/testing.
 import { Testing, TestingToBeMatchers } from '@angular-package/testing';
 // @angular-package/type.
-import { is, ResultCallback } from '@angular-package/type';
+import { is } from '@angular-package/type';
+/**
+ * ValidationError
+ */
+import { ValidationError } from '@angular-package/error';
 /**
  * Callback.
  */
 import { Callback } from '../lib/callback.class';
-/**
- * ValidationError
- */
-import { ValidationError } from '../../error/src/validation-error.class';
-// Constants.
+// Type
+import { ResultCallback } from '../type/result-callback.type';
+ // Constants.
 import {
   TESTING_FALSE,
   TESTING_OBJECT,
@@ -19,7 +21,7 @@ import {
 /**
  * Initialize Testing.
  */
-const testing = new Testing(false, true);
+const testing = new Testing(true, true);
 const toBe = new TestingToBeMatchers();
 /**
  * Tests.
@@ -50,14 +52,14 @@ testing.describe(Callback.name, () => {
     );
 
   //#region Callback static methods
-  // Callback.defineCallback()
-  testing.describe(`Callback.defineCallback()`, () => {
+  // Callback.defineResultCallback()
+  testing.describe(`.defineResultCallback()`, () => {
     let stringCallback: ResultCallback;
     testing.it('defining `ResultCallback` properly', () => {
-      stringCallback = Callback.defineCallback(
-        (result: boolean, value: any) => {
+      stringCallback = Callback.defineResultCallback(
+        (result: boolean, payload) => {
           if (is.false(result)) {
-            throw new ValidationError(`It's not a string type, got ${value}`);
+            throw new ValidationError(`It's not a string type, got ${payload}`);
           }
         }
       );
@@ -67,6 +69,7 @@ testing.describe(Callback.name, () => {
       } catch (e) {
         if (e instanceof ValidationError) {
           toBe.string(e.message);
+          console.log(e.message);
           expect(e.message).toEqual(`It's not a string type, got 5`);
         }
       }
@@ -74,13 +77,13 @@ testing.describe(Callback.name, () => {
 
     testing.it('defining `ResultCallback` not properly', () => {
       const falseCallback: any = false;
-      stringCallback = Callback.defineCallback(falseCallback);
+      stringCallback = Callback.defineResultCallback(falseCallback);
       toBe.function(stringCallback).false(is.string(5, stringCallback));
     });
   });
 
   // Callback.defineErrorCallback()
-  testing.describe(`Callback.defineErrorCallback()`, () => {
+  testing.describe(`.defineErrorCallback()`, () => {
     let stringErrorCallback: ResultCallback;
     const problem = 'Value is not a string';
     const fix = 'Provide proper type';
@@ -110,7 +113,7 @@ testing.describe(Callback.name, () => {
   });
 
   // Callback.guard()
-  testing.describe(`Callback.guard()`, () => {
+  testing.describe(`.guard()`, () => {
     const stringCallback: ResultCallback = (result: boolean, value: any) =>
       result;
     testing
@@ -123,7 +126,7 @@ testing.describe(Callback.name, () => {
   });
 
   // Callback.isCallback()
-  testing.describe(`Callback.isCallback()`, () =>
+  testing.describe(`.isCallback()`, () =>
     testing
       .toEqual(
         'method should have checked instance in `true` state',
@@ -139,16 +142,17 @@ testing.describe(Callback.name, () => {
   //#endregion
 
   // Constructor
-  testing.describe(`Callback()`, () => {
+  testing.describe(`constructor()`, () => {
     testing.describe(`properly instantiate`, () => {
       const callbacks = new Callback('isString', 'isNumber');
       testing.it('with allowedNames', () => {
         toBe
           .undefined(callbacks.getCallback('isString'))
           .undefined(callbacks.getCallback('isNumber'));
+
         callbacks
-          .setCallback('isString', (result: boolean) => result)
-          .setCallback('isNumber', (result: boolean) => result);
+          .setResultCallback('isString', (result: boolean) => result)
+          .setResultCallback('isNumber', (result: boolean) => result);
         toBe
           .function(callbacks.getCallback('isString'))
           .function(callbacks.getCallback('isNumber'));
@@ -156,19 +160,19 @@ testing.describe(Callback.name, () => {
 
       testing.it('and cannot set function with not allowed `firstName`', () => {
         const storageName: any = 'firstName';
-        callbacks.setCallback(storageName, (result) => result);
+        callbacks.setResultCallback(storageName, (result) => result);
         toBe.undefined(callbacks.getCallback(storageName));
       });
     });
   });
 
   //#region Callback public methods
-  testing.describe(`Callback.prototype.setCallback()`, () => {
+  testing.describe(`.prototype.setCallback()`, () => {
     testing.it(
       'should properly sets the callback function under the `setCallback` name',
       () => {
         toBe.undefined(callback.getCallback('setCallback'));
-        callback.setCallback('setCallback', (result: boolean, value: any) => {
+        callback.setResultCallback('setCallback', (result: boolean, value: any) => {
           if (is.false(result)) {
             throw new ValidationError('The given value must be a string type');
           }
@@ -178,7 +182,7 @@ testing.describe(Callback.name, () => {
     );
   });
 
-  testing.describe(`Callback.prototype.getCallback()`, () => {
+  testing.describe(`.prototype.getCallback()`, () => {
     try {
       is.string(5, callback.getCallback('setCallback'));
     } catch (e) {
@@ -189,7 +193,7 @@ testing.describe(Callback.name, () => {
     }
   });
 
-  testing.describe(`Callback.prototype.setErrorCallback()`, () => {
+  testing.describe(`.prototype.setErrorCallback()`, () => {
     const message = 'This is test error';
     testing.it('properly working with message of a string type', () => {
       callback.setErrorCallback('setCallback', message, false);

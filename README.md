@@ -139,15 +139,15 @@ Manages the callback [`function`][js-function] of a [`ResultCallback`](#resultca
 
 **Instance methods:**
 
-| Callback.prototype.                               | Description |
-| :------------------------------------------------ | :---------- |
-| [`getCallback()`][callback-getcallback]           | Gets from the storage specified by-name callback [`function`][js-function] of a [`ResultCallback`](#resultcallback) type |
-| [`setErrorCallback()`][callback-seterrorcallback] | Sets a callback [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that throws [`ValidationError`][error-validationerror] with a specified message on a state from the provided `throwOnState` to the storage under the given allowed name restricted by `AllowNames` |
-| [`setResultCallback()`][callback-setcallback]     | Sets a callback  of a [`ResultCallback`](#resultcallback) type to the storage under the given allowed `name`, which is restricted by `AllowNames` |
+| Callback.prototype.                                 | Description |
+| :-------------------------------------------------- | :---------- |
+| [`getCallback()`][callback-getcallback]             | Gets from the storage specified by-name callback [`function`][js-function] of a [`ResultCallback`](#resultcallback) type |
+| [`setErrorCallback()`][callback-seterrorcallback]   | Sets a callback [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that throws [`ValidationError`][error-validationerror] with a specified message on a state from the provided `throwOnState` to the storage under the given allowed name restricted by `AllowNames` |
+| [`setResultCallback()`][callback-setresultcallback] | Sets a callback  of a [`ResultCallback`](#resultcallback) type to the storage under the given allowed `name`, which is restricted by `AllowNames` |
 
 [callback-getcallback]: #callbackprototypegetcallback
-[callback-setcallback]: #callbackprototypesetcallback
 [callback-seterrorcallback]: #callbackprototypeseterrorcallback
+[callback-setresultcallback]: #callbackprototypesetresultcallback
 
 <br>
 
@@ -332,13 +332,13 @@ static guard<Payload extends object>(
 
 | Name: type                                | Description |
 | :---------------------------------------- | :---------- |
-| `resultCallback: ResultCallback<Payload>` | The [`function`][js-function] of [`ResultCallback`](#resultcallback) type with the shape of payload from the generic variable `Payload` to guard  |
+| `resultCallback: ResultCallback<Payload>` | The [`function`][js-function] of [`ResultCallback`](#resultcallback) type with the shape of payload from the generic type variable `Payload` to guard  |
 
 **Returns:**
 
 | Returns                                     | Type      | Description  |
 | :------------------------------------------ | :-------: | :----------- |
-| `resultCallback is ResultCallback<Payload>` | `boolean` | The **return type** is [`boolean`][js-boolean] as the result of its statement that indicates the provided `resultCallback` is a [`function`][js-function] of a [`ResultCallback`](#resultcallback) type with the shape of payload from the generic variable `Payload` |
+| `resultCallback is ResultCallback<Payload>` | `boolean` | The **return type** is [`boolean`][js-boolean] as the result of its statement that indicates the provided `resultCallback` is a [`function`][js-function] of a [`ResultCallback`](#resultcallback) type with the shape of payload from the generic type variable `Payload` |
 
 The **return value** is a `boolean` indicating whether the provided `resultCallback` parameter is a [`function`][js-function].
 
@@ -371,7 +371,7 @@ static isCallback<AllowNames extends string>(
 
 | Name                        | Description |
 | :-------------------------- | :---------- |
-| `AllowNames extends string` | An optional generic variable of `AllowNames` name that is constrained by the [`string`][js-string] type and is used to indicate allowed names under which callback functions can be stored for the return type `value is Callback<AllowNames>`. Its value can be captured from the provided `allowNames` rest parameter  |
+| `AllowNames extends string` | An optional generic type variable of `AllowNames` name that is constrained by the [`string`][js-string] type and is used to indicate allowed names under which callback functions can be stored for the return type `value is Callback<AllowNames>`. Its value can be captured from the provided `allowNames` rest parameter  |
 
 **Parameters:**
 
@@ -384,7 +384,7 @@ static isCallback<AllowNames extends string>(
 
 | Returns                         | Type      | Description |
 | :------------------------------ | :-------: | :---------- |
-| `value is Callback<AllowNames>` | `boolean` | The **return type** is `boolean` as the result of its statement that indicates the provided `value` is  a [`Callback`](#callback) with allowed names from the provided `allowNames` parameter or generic variable `AllowNames` |
+| `value is Callback<AllowNames>` | `boolean` | The **return type** is `boolean` as the result of its statement that indicates the provided `value` is  a [`Callback`](#callback) with allowed names from the provided `allowNames` parameter or generic type variable `AllowNames` |
 
 The **return value** is a `boolean` indicating whether the `value` is an instance of [`Callback`](#callback) .
 
@@ -428,7 +428,7 @@ new Callback<AllowNames extends string>(...allowNames: AllowNames[]) {
 
 | Name                          | Description |
 | :---------------------------- | :---------- |
-| `AllowedNames extends string` | A generic variable `AllowNames` that is constrained by the [`string`][js-string] type and is used to **restrict** allowed names under which callback functions can be stored. By default, its value is captured from the provided `allowNames` rest parameter |
+| `AllowedNames extends string` | A generic type variable `AllowNames` that is constrained by the [`string`][js-string] type and is used to **restrict** allowed names under which callback functions can be stored. By default, its value is captured from the provided `allowNames` rest parameter |
 
 **Parameters:**
 
@@ -511,7 +511,7 @@ callback
 ```
 
 ```typescript
-// Generic variable payload example usage.
+// Generic type variable payload example usage.
 import { Callback } from '@angular-package/callback';
 /**
  * Initialize `Callback`.

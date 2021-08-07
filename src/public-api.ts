@@ -2,9 +2,16 @@
  * Public API Surface of callback
  */
 export {
+  // Class.
   Callback
-} from './lib/callback.class';
+} from './lib';
 
 export {
+  // Interface.
   CallbackPayload
-} from './interface/callback-payload.interface';
+} from './interface';
+
+export {
+  // Type.
+  ResultCallback
+} from './type';

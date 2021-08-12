@@ -1,11 +1,11 @@
 {
   "name": "@angular-package/callback",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Manages the callback function.",
   "author": "Angular Package <angular-package@wvvw.dev> (https://wvvw.dev)",
   "homepage": "https://github.com/angular-package/callback#readme",
   "peerDependencies": {
-    "@angular-package/error": "^1.0.1",
+    "@angular-package/error": "^2.0.2",
     "@angular-package/type": "^4.2.0"
   },
   "dependencies": {

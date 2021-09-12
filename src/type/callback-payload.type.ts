@@ -1,7 +1,7 @@
 /**
  * Experimental shape for a generic type variable `Payload`.
  */
-export interface CallbackPayload {
+export type CallbackPayload<Payload = object> = {
   /**
    * An optional action of a `string` type that describes the cause of performed callback.
    */
@@ -17,10 +17,4 @@ export interface CallbackPayload {
    */
   param?: string;
 
-  /**
-   * An optional value of of related parameter of any type.
-   */
-  value?: any;
-
-  [index: string]: any;
-}
+} & Payload;

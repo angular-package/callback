@@ -1,10 +1,8 @@
 /**
- * Function to handle the result of the `ResultCallback` function before its result returns with optional payload.
+ * Internal function to handle the arguments of the `ResultCallback` function before its result return.
  */
-export type ResultHandler<Payload extends object = any> = (
-  // Result of the callback.
+export type ResultHandler<Value = any, Payload = object> = (
   result: boolean,
-
-  // An optional object to provide more data.
+  value: Value,
   payload?: Payload
 ) => void;

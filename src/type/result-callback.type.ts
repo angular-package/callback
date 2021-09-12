@@ -1,11 +1,15 @@
 /**
- * Represents a callback function with parameters, a `result` of a `boolean` type, and an optional `payload` of a generic type `Payload`.
- * @var Payload The shape of the optional `payload` parameter that is constrained by the `object` type.
- * @param result What the result concerns is not specified, so it can be anything - the creator decides.
- * @param payload An optional `object` of a generic type `Payload` to provide more data.
- * @returns The return value is a `boolean` indicating state of the result of any action.
+ * Represents a callback function with parameters, the `value` that has been checked, the `result` of this check, and an optional
+ * `payload`.
+ * @var Value A generic type variable `Value` by default equal to `any` determines the type of the `value` parameter.
+ * @var Payload The shape of the optional `payload` parameter, by default equal to the `object`.
+ * @param result The result of the check of a `boolean` type.
+ * @param value The value that has been checked of a generic type variable `Value`.
+ * @param payload An optional `object` of a generic type variable `Payload` to provide more data.
+ * @returns The return value is a `boolean`.
  */
-export type ResultCallback<Payload extends object = any> = (
+export type ResultCallback<Value = any, Payload = object> = (
   result: boolean,
+  value: Value,
   payload?: Payload
 ) => boolean;

@@ -44,6 +44,7 @@ Manages the callback [`function`][js-function].
 * [`Callback`](#callback)
 * [Interface](#interface)
 * [Type](#type)
+* [Changelog](#changelog)
 * [Git](#git)
   * [Commit](#commit)
   * [Versioning](#versioning)
@@ -78,7 +79,7 @@ Sets
 
 ## Skeleton
 
-This package was built by the [library skeleton][skeleton] which was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.1.1.
+This package was built by the [library skeleton][skeleton] which was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.5.
 
 Copy this package to the `packages/callback` folder of the [library skeleton][skeleton] then run the commands below.
 
@@ -109,8 +110,11 @@ import {
   // Class.
   Callback,
 
+  // Interface.
+  CallbackPayload,
+
   // Type.
-  CallbackPayload
+  ResultCallback
 } from '@angular-package/callback';
 ```
 
@@ -118,7 +122,7 @@ import {
 
 ## `Callback`
 
-Manages the callback [`function`][js-function] of a [`ResultCallback`](#resultcallback) type.
+Manages the callback [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type.
 
 <br>
 
@@ -126,50 +130,48 @@ Manages the callback [`function`][js-function] of a [`ResultCallback`](#resultca
 
 | Callback.                                                 | Description |
 | :-------------------------------------------------------- | :---------- |
-| [`defineResultCallback()`](#callbackdefineresultcallback) | Defines the [`function`][js-function] of [`ResultCallback`](#resultcallback) type that contains a [`ResultHandler`](#resulthandler) function to handle the `result` and optional `payload` |
-| [`defineErrorCallback()`](#callbackdefineerrorcallback)   | Defines the [`function`][js-function] of [`ResultCallback`](#resultcallback) type to throw [`ValidationError`][error-validationerror] with a specified message on a state from the `throwOnState` |
-| [`guard()`](#callbackguard)                               | Guards the provided `resultCallback` to be [`ResultCallback`](#resultcallback) type |
-| [`isCallback()`](#callbackiscallback)                     | Checks if the provided `value` is an instance of [`Callback`](#callback) with optional indicating allowed names under which callback functions can be stored |
+| [`defineResultCallback()`](#callbackdefineresultcallback) | Defines the [`function`][js-function] of the [`ResultCallback`][package-type-resultcallback] type that contains a [`ResultHandler`](#resulthandler) function to handle the `result`, `value`, and optional `payload` without returning the `result`. |
+| [`defineErrorCallback()`](#callbackdefineerrorcallback)   | Defines a callback [`function`][js-function] of [`ResultCallback`][package-type-resultcallback] type to throw [`ValidationError`][error-validationerror] with a specified message on a state from the `throwOnState`. |
+| [`defineForEachCallback()`](#defineforeachcallback)       | Defines a callback [`function`][js-function] of [`ForEachCallback`][package-type-foreachcallback] type. |
+| [`guard()`](#callbackguard)                               | Guards the provided `resultCallback` to be [`ResultCallback`][package-type-resultcallback] type. |
+| [`isCallback()`](#callbackiscallback)                     | Checks if the provided `value` is an instance of [`Callback`](#callback) with optional indicating allowed names under which callback functions can be stored. |
 
 **Constructor:**
 
 | Constructor                           | Description |
 | :------------------------------------ | :---------- |
-| [`Callback()`](#callback-constructor) | Initialize an instance of a [`Callback`](#callback) with the allowed names under which callback functions can be stored |
+| [`Callback()`](#callback-constructor) | Initialize an instance of a [`Callback`](#callback) with the allowed names under which callback functions can be stored. |
 
 **Instance methods:**
 
-| Callback.prototype.                                 | Description |
-| :-------------------------------------------------- | :---------- |
-| [`getCallback()`][callback-getcallback]             | Gets from the storage specified by-name callback [`function`][js-function] of a [`ResultCallback`](#resultcallback) type |
-| [`setErrorCallback()`][callback-seterrorcallback]   | Sets a callback [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that throws [`ValidationError`][error-validationerror] with a specified message on a state from the provided `throwOnState` to the storage under the given allowed name restricted by `AllowNames` |
-| [`setResultCallback()`][callback-setresultcallback] | Sets a callback  of a [`ResultCallback`](#resultcallback) type to the storage under the given allowed `name`, which is restricted by `AllowNames` |
+| Callback.prototype.                                   | Description |
+| :---------------------------------------------------- | :---------- |
+| [`getCallback()`][callback-getcallback]               | Gets from the storage specified by-name callback [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type. |
+| [`setErrorCallback()`][callback-seterrorcallback]     | Sets a callback [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type that throws [`ValidationError`][error-validationerror] with a specified message on a state from the provided `throwOnState` to the storage under the given allowed name restricted by `AllowNames`. |
+| [`setForEachCallback()`][callback-setforeachcallback] | Sets a callback  of a [`ResultCallback`][package-type-resultcallback] type to the storage under the given allowed `name`, which is restricted by `AllowNames`. |
+| [`setResultCallback()`][callback-setresultcallback]   | Sets a callback  of a [`ResultCallback`][package-type-resultcallback] type to the storage under the given allowed `name`, which is restricted by `AllowNames`. |
 
 [callback-getcallback]: #callbackprototypegetcallback
 [callback-seterrorcallback]: #callbackprototypeseterrorcallback
+[callback-setforeachcallback]: #callbackprototypesetforeachcallback
 [callback-setresultcallback]: #callbackprototypesetresultcallback
 
 <br>
 
 ### `Callback` static methods
 
-----
-
 #### `Callback.defineResultCallback()`
 
-Defines the [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that contains a [`ResultHandler`](#resulthandler) function to handle the `result` and optional `payload`.
+Defines the [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type that contains a [`ResultHandler`](#resulthandler) function to handle the `result`, `value`, and optional `payload`.
 
 ```typescript
-static defineResultCallback<Payload extends object>(
-  resultHandler: ResultHandler<Payload>,
-  capturePayload?: Payload
-): ResultCallback<Payload> {
-  return (result: boolean, payload?: Payload) => {
-    if (is.function(resultHandler)) {
-      resultHandler(result, payload);
-    }
-    return result;
-  };
+static defineResultCallback<Value = any, Payload extends object = object>(
+  resultHandler: ResultHandler<Value, Payload>,
+  defaultPayload?: Payload
+): ResultCallback<Value, Payload> {
+  return (result: boolean, value: Value, payload = defaultPayload) => (
+    resultHandler(result, value, payload), result
+  );
 }
 ```
 
@@ -177,22 +179,22 @@ static defineResultCallback<Payload extends object>(
 
 | Name                     | Description |
 | :----------------------- | :---------- |
-| `Payload extends object` | The shape of the optional payload parameter of the [`ResultCallback`](#resultcallback) and [`ResultHandler`](#resulthandler) function, which is constrained by the [`object`][js-object] type. Its value can be captured from a type of the provided `capturePayload` optional parameter |
+| `Payload extends object` | The shape of the optional payload parameter of the [`ResultCallback`][package-type-resultcallback] and [`ResultHandler`](#resulthandler) function, which is constrained by the [`object`][js-object] type. Its value can be captured from a type of the provided `capturePayload` optional parameter. |
 
 **Parameters:**
 
 | Name: type                              | Description |
 | :-------------------------------------- | :---------- |
-| `resultHandler: ResultHandler<Payload>` | The [`function`][js-function] that is guarded by the [`ResultHandler`](#resulthandler) type to handle the result and optional payload of the [`ResultCallback`](#resultcallback) function |
-| `capturePayload?: Payload`              | An optional [`object`][js-object] of generic type `Payload` that is used only to capture the value by the generic type variable `Payload` |
+| `resultHandler: ResultHandler<Payload>` | The [`function`][js-function] that is guarded by the [`ResultHandler`](#resulthandler) type to handle the result and optional payload of the [`ResultCallback`][package-type-resultcallback] function. |
+| `capturePayload?: Payload`              | An optional [`object`][js-object] of generic type `Payload` that is used only to capture the value by the generic type variable `Payload`. |
 
 **Returns:**
 
 | Returns                   | Type       | Description  |
 | :------------------------ | :--------: | :----------- |
-| `ResultCallback<Payload>` | `Function` | The **return type** is a [`function`][js-function] of [`ResultCallback`](#resultcallback) |
+| `ResultCallback<Payload>` | `Function` | The **return type** is a [`function`][js-function] of [`ResultCallback`][package-type-resultcallback]. |
 
-The **return value** is a [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that contains a [`function`][js-function] of [`ResultHandler`](#resulthandler).
+The **return value** is a [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type that contains a [`function`][js-function] of [`ResultHandler`](#resulthandler).
 
 **Usage:**
 
@@ -239,7 +241,7 @@ isPerson({ firstName: 'My name' }, personCallback);
 
 #### `Callback.defineErrorCallback()`
 
-Defines [`function`][js-function] of [`ResultCallback`](#resultcallback) type to throw [`ValidationError`][error-validationerror] with a specified message on a state from `throwOnState`. Provided `payload` from defined callback function of [`ResultCallback`](#resultcallback) is being passed to a thrown error of [`ValidationError`][error-validationerror].
+Defines [`function`][js-function] of [`ResultCallback`][package-type-resultcallback] type to throw [`ValidationError`][error-validationerror] with a specified message on a state from `throwOnState`. Provided `payload` from defined callback function of [`ResultCallback`][package-type-resultcallback] is being passed to a thrown error of [`ValidationError`][error-validationerror].
 
 ```typescript
 static defineErrorCallback<Payload extends object>(
@@ -261,23 +263,23 @@ static defineErrorCallback<Payload extends object>(
 
 | Name                     | Description |
 | :----------------------- | :---------- |
-| `Payload extends object` | The shape of the optional payload parameter of the [`ResultCallback`](#resultcallback) function, which is constrained by the [`object`][js-object] type. Its value can be captured from a type of the provided `capturePayload` optional parameter |
+| `Payload extends object` | The shape of the optional payload parameter of the [`ResultCallback`][package-type-resultcallback] function, which is constrained by the [`object`][js-object] type. Its value can be captured from a type of the provided `capturePayload` optional parameter. |
 
 **Parameters:**
 
 | Name: type                        | Description |
 | :-------------------------------- | :---------- |
-| `message: string \| ErrorMessage` | The message of [`string`][js-string] type or [`ErrorMessage`](#errormessage) interface to throw with an error of [`ValidationError`][error-validationerror] |
-| `throwOnState: boolean`           | A state of [`boolean`][js-boolean] type on which an error of [`ValidationError`][error-validationerror] should be thrown. By default, it's set to `false` |
-| `capturePayload?: Payload`        | An optional [`object`][js-object] of generic type `Payload` that is used only to capture the value by the generic type variable `Payload` |
+| `message: string \| ErrorMessage` | The message of [`string`][js-string] type or [`ErrorMessage`](#errormessage) interface to throw with an error of [`ValidationError`][error-validationerror]. |
+| `throwOnState: boolean`           | A state of [`boolean`][js-boolean] type on which an error of [`ValidationError`][error-validationerror] should be thrown. By default, it's set to `false`. |
+| `capturePayload?: Payload`        | An optional [`object`][js-object] of generic type `Payload` that is used only to capture the value by the generic type variable `Payload`. |
 
 **Returns:**
 
 | Returns                   | Type       | Description  |
 | :------------------------ | :--------: | :----------- |
-| `ResultCallback<Payload>` | `Function` | The **return type** is a [`function`][js-function] of a [`ResultCallback`](#resultcallback) type |
+| `ResultCallback<Payload>` | `Function` | The **return type** is a [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type. |
 
-The **return value** is a [`function`][js-function] of a [`ResultCallback`](#resultcallback) type that throws a [`ValidationError`][error-validationerror].
+The **return value** is a [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type that throws a [`ValidationError`][error-validationerror].
 
 **Usage:**
 
@@ -312,7 +314,7 @@ try {
 
 #### `Callback.guard()`
 
-Guards the provided `resultCallback` to be [`ResultCallback`](#resultcallback) type.
+Guards the provided `resultCallback` to be [`ResultCallback`][package-type-resultcallback] type.
 
 ```typescript
 static guard<Payload extends object>(
@@ -326,19 +328,19 @@ static guard<Payload extends object>(
 
 | Name                     | Description |
 | :----------------------- | :---------- |
-| `Payload extends object` | The shape of the optional payload parameter of the [`ResultCallback`](#resultcallback) function, which is constrained by the [`object`][js-object] type |
+| `Payload extends object` | The shape of the optional payload parameter of the [`ResultCallback`][package-type-resultcallback] function, which is constrained by the [`object`][js-object] type. |
 
 **Parameters:**
 
 | Name: type                                | Description |
 | :---------------------------------------- | :---------- |
-| `resultCallback: ResultCallback<Payload>` | The [`function`][js-function] of [`ResultCallback`](#resultcallback) type with the shape of payload from the generic type variable `Payload` to guard  |
+| `resultCallback: ResultCallback<Payload>` | The [`function`][js-function] of [`ResultCallback`][package-type-resultcallback] type with the shape of payload from the generic type variable `Payload` to guard. |
 
 **Returns:**
 
 | Returns                                     | Type      | Description  |
 | :------------------------------------------ | :-------: | :----------- |
-| `resultCallback is ResultCallback<Payload>` | `boolean` | The **return type** is [`boolean`][js-boolean] as the result of its statement that indicates the provided `resultCallback` is a [`function`][js-function] of a [`ResultCallback`](#resultcallback) type with the shape of payload from the generic type variable `Payload` |
+| `resultCallback is ResultCallback<Payload>` | `boolean` | The **return type** is [`boolean`][js-boolean] as the result of its statement that indicates the provided `resultCallback` is a [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type with the shape of payload from the generic type variable `Payload`. |
 
 The **return value** is a `boolean` indicating whether the provided `resultCallback` parameter is a [`function`][js-function].
 
@@ -371,20 +373,20 @@ static isCallback<AllowNames extends string>(
 
 | Name                        | Description |
 | :-------------------------- | :---------- |
-| `AllowNames extends string` | An optional generic type variable of `AllowNames` name that is constrained by the [`string`][js-string] type and is used to indicate allowed names under which callback functions can be stored for the return type `value is Callback<AllowNames>`. Its value can be captured from the provided `allowNames` rest parameter  |
+| `AllowNames extends string` | An optional generic type variable of `AllowNames` name that is constrained by the [`string`][js-string] type and is used to indicate allowed names under which callback functions can be stored for the return type `value is Callback<AllowNames>`. Its value can be captured from the provided `allowNames` rest parameter. |
 
 **Parameters:**
 
 | Name: type                    | Description |
 | :---------------------------- | :---------- |
 | `value: any`                  | The `value` of any type to check |
-| `...allowNames: AllowNames[]` | A rest parameter of `AllowNames` that is used only to capture the value by the generic type variable `AllowNames` to indicate allowed names for the `Callback<AllowNames>` return type |
+| `...allowNames: AllowNames[]` | A rest parameter of `AllowNames` that is used only to capture the value by the generic type variable `AllowNames` to indicate allowed names for the `Callback<AllowNames>` return type. |
 
 **Returns:**
 
 | Returns                         | Type      | Description |
 | :------------------------------ | :-------: | :---------- |
-| `value is Callback<AllowNames>` | `boolean` | The **return type** is `boolean` as the result of its statement that indicates the provided `value` is  a [`Callback`](#callback) with allowed names from the provided `allowNames` parameter or generic type variable `AllowNames` |
+| `value is Callback<AllowNames>` | `boolean` | The **return type** is `boolean` as the result of its statement that indicates the provided `value` is  a [`Callback`](#callback) with allowed names from the provided `allowNames` parameter or generic type variable `AllowNames`. |
 
 The **return value** is a `boolean` indicating whether the `value` is an instance of [`Callback`](#callback) .
 
@@ -428,13 +430,13 @@ new Callback<AllowNames extends string>(...allowNames: AllowNames[]) {
 
 | Name                          | Description |
 | :---------------------------- | :---------- |
-| `AllowedNames extends string` | A generic type variable `AllowNames` that is constrained by the [`string`][js-string] type and is used to **restrict** allowed names under which callback functions can be stored. By default, its value is captured from the provided `allowNames` rest parameter |
+| `AllowedNames extends string` | A generic type variable `AllowNames` that is constrained by the [`string`][js-string] type and is used to **restrict** allowed names under which callback functions can be stored. By default, its value is captured from the provided `allowNames` rest parameter. |
 
 **Parameters:**
 
 | Name: type                   | Description |
 | :--------------------------- | :---------- |
-| `allowNames: AllowedNames[]` | A rest parameter of a [`string`][js-string] type allowed names under which callback functions can be stored. Only those names given by this parameter are being checked by the `isNameAllowed()` private method |
+| `allowNames: AllowedNames[]` | A rest parameter of a [`string`][js-string] type allowed names under which callback functions can be stored. Only those names given by this parameter are being checked by the `isNameAllowed()` private method. |
 
 **Returns:**
 
@@ -459,7 +461,7 @@ const callback = new Callback('set', 'define');
 
 #### `Callback.prototype.getCallback()`
 
-Gets from the storage specified by-name callback [`function`][js-function] of a [`ResultCallback`](#resultcallback) type.
+Gets from the storage specified by-name callback [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type.
 
 ```typescript
 public getCallback<
@@ -477,23 +479,23 @@ public getCallback<
 
 | Name                      | Description |
 | :------------------------ | :---------- |
-| `Payload extends object`  | The shape of the optional payload parameter of the [`ResultCallback`](#resultcallback) function, which is constrained by the [`object`][js-object] type. Its value can be captured from a type of the provided `capturePayload` optional parameter |
-| `Name extends AllowNames` | A generic type variable `Name` constrained by the `AllowNames` indicates the name under which callback [`function`][js-function] is picked from the storage. It is linked with the return type `Pick<CallbackStorage, Name>[Name]` that refers exactly to the type, which is [`ResultCallback`](#resultcallback) of the callback [`function`][js-function] picked from the storage by `Name`. By default, its value is captured from the provided `name` |
+| `Payload extends object`  | The shape of the optional payload parameter of the [`ResultCallback`][package-type-resultcallback] function, which is constrained by the [`object`][js-object] type. Its value can be captured from a type of the provided `capturePayload` optional parameter. |
+| `Name extends AllowNames` | A generic type variable `Name` constrained by the `AllowNames` indicates the name under which callback [`function`][js-function] is picked from the storage. It is linked with the return type `Pick<CallbackStorage, Name>[Name]` that refers exactly to the type, which is [`ResultCallback`][package-type-resultcallback] of the callback [`function`][js-function] picked from the storage by `Name`. By default, its value is captured from the provided `name`. |
 
 **Parameters:**
 
 | Name: type                 | Description |
 | :------------------------- | :---------- |
-| `name: Name`               | A [`string`][js-string] type name that is restricted by the `AllowNames` to pick stored callback [`function`][js-function] |
-| `capturePayload?: Payload` | An optional [`object`][js-object] of generic type `Payload` that is used only to capture the value by the generic type variable `Payload` |
+| `name: Name`               | A [`string`][js-string] type name that is restricted by the `AllowNames` to pick stored callback [`function`][js-function]. |
+| `capturePayload?: Payload` | An optional [`object`][js-object] of generic type `Payload` that is used only to capture the value by the generic type variable `Payload`. |
 
 **Returns:**
 
 | Returns                             | Type       | Description |
 | :---------------------------------- | :--------: | :---------- |
-| `Pick<CallbackStorage, Name>[Name]` | `function` | The **return type** is a [`ResultCallback`](#resultcallback) [`function`][js-function] that is picked from the `CallbackStorage` by using `Name` |
+| `Pick<CallbackStorage, Name>[Name]` | `function` | The **return type** is a [`ResultCallback`][package-type-resultcallback] [`function`][js-function] that is picked from the `CallbackStorage` by using `Name`. |
 
-The **return value** is the callback `function` of a [`ResultCallback`](#resultcallback) type picked from the storage.
+The **return value** is the callback `function` of a [`ResultCallback`][package-type-resultcallback] type picked from the storage.
 
 **Usage:**
 
@@ -575,7 +577,7 @@ firstNameCallback(false, { id: 5, name: 'there is no name' });
 
 #### `Callback.prototype.setErrorCallback`
 
-Sets a [`function`][js-function] of a [`ResultCallback`](#resultcallback) type to the storage under the given allowed name with the given error message to throw on the specified state from the `throwOnState`.
+Sets a [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type to the storage under the given allowed name with the given error message to throw on the specified state from the `throwOnState`.
 
 ```typescript
 public setErrorCallback<Name extends AllowNames>(
@@ -592,15 +594,15 @@ public setErrorCallback<Name extends AllowNames>(
 
 | Name                      | Description |
 | :------------------------ | :---------- |
-| `Name extends AllowNames` | A generic `Name` variable constrained by the `AllowNames` indicates the name under which callback [`function`][js-function] is stored. By default, its value is captured from the provided `name` |
+| `Name extends AllowNames` | A generic `Name` variable constrained by the `AllowNames` indicates the name under which callback [`function`][js-function] is stored. By default, its value is captured from the provided `name`. |
 
 **Parameters:**
 
 | Name: type                        | Description |
 | :-------------------------------- | :---------- |
-| `name: Name`                      | A `string` type name that is restricted by the `AllowNames` under which the [`function`][js-function] is stored. The allowed status of the provided `name` is checked by the private method `isNameAllowed()` |
-| `message: string \| ErrorMessage` | The message of string type or [`ErrorMessage`](#errormessage) interface, to throw with an error of [`ValidationError`][error-validationerror] |
-| `throwOnState: boolean`           | A state of [`boolean`][js-boolean] type on which an error of [`ValidationError`][error-validationerror] should be thrown. By default, it's set to `false` |
+| `name: Name`                      | A `string` type name that is restricted by the `AllowNames` under which the [`function`][js-function] is stored. The allowed status of the provided `name` is checked by the private method `isNameAllowed()`. |
+| `message: string \| ErrorMessage` | The message of string type or [`ErrorMessage`](#errormessage) interface, to throw with an error of [`ValidationError`][error-validationerror]. |
+| `throwOnState: boolean`           | A state of [`boolean`][js-boolean] type on which an error of [`ValidationError`][error-validationerror] should be thrown. By default, it's set to `false`. |
 
 **Returns:**
 
@@ -628,7 +630,7 @@ callback.setErrorCallback('lastName', 'LastName must be a string type', false);
 
 #### `Callback.prototype.setResultCallback()`
 
-Sets a callback function of a [`ResultCallback`](#resultcallback) type to the storage under the given allowed `name` restricted by `AllowNames`.
+Sets a callback function of a [`ResultCallback`][package-type-resultcallback] type to the storage under the given allowed `name` restricted by `AllowNames`.
 
 ```typescript
 public setResultCallback<
@@ -653,21 +655,21 @@ public setResultCallback<
 
 | Name                      | Description |
 | :------------------------ | :---------- |
-| `Payload extends object`  | The shape of the optional payload parameter of the [`ResultCallback`](#resultcallback) function, which is constrained by the [`object`][js-object] type. Its value can be captured from a type of the provided `capturePayload` optional parameter |
-| `Name extends AllowNames` | A generic type variable `Name` constrained by the `AllowNames` indicates the name under which callback [`function`][js-function] is stored. By default, its value is captured from the provided `name` |
+| `Payload extends object`  | The shape of the optional payload parameter of the [`ResultCallback`][package-type-resultcallback] function, which is constrained by the [`object`][js-object] type. Its value can be captured from a type of the provided `capturePayload` optional parameter. |
+| `Name extends AllowNames` | A generic type variable `Name` constrained by the `AllowNames` indicates the name under which callback [`function`][js-function] is stored. By default, its value is captured from the provided `name`. |
 
 **Parameters:**
 
 | Name: type                     | Description |
 | :----------------------------- | :---------- |
-| `name: Name`                   | A `string` type name that is restricted by the `AllowNames` under which the [`function`][js-function] is stored. The allowed status of the provided `name` is checked by the private method `isNameAllowed()` |
-| `resultHandler: ResultHandler` | The [`function`][js-function] of [`ResultHandler`](#resulthandler) to handle the result of the [`ResultCallback`](#resultcallback) [`function`][js-function] before its result returns |
+| `name: Name`                   | A `string` type name that is restricted by the `AllowNames` under which the [`function`][js-function] is stored. The allowed status of the provided `name` is checked by the private method `isNameAllowed()`. |
+| `resultHandler: ResultHandler` | The [`function`][js-function] of [`ResultHandler`](#resulthandler) to handle the result of the [`ResultCallback`][package-type-resultcallback] [`function`][js-function] before its result returns. |
 
 **Returns:**
 
 | Returns | Type     | Description |
 | :------ | :------: | :---------- |
-| `this`  | `object` | The **return type** is an instance of `Callback` |
+| `this`  | `object` | The **return type** is an instance of `Callback`. |
 
 The **return value** is an instance of [`Callback`](#callback).
 
@@ -800,123 +802,13 @@ firstNameCallback(false, { id: 5, name: 'there is no name' });
 
 <br>
 
-## Interface
-
-#### `CallbackPayload`
-
-![experimental]
-
-Experimental shape for a generic type variable `Payload`.
-
-```typescript
-export interface CallbackPayload {
-  action?: string;
-  name?: string;
-  param?: string;
-  value?: any;
-  [index: string]: any;
-}
-```
-
-**Properties:**
-
-**`action?: string`**  
-An optional action that describes the cause of performed callback.
-
-**`name?: string`**  
-An optional name of the [`function`][js-function] or method that performed callback.
-
-**`param?: string`**  
-An optional name of the parameter of a [`string`][js-string] type to which performed callback relates.
-
-**`value?: any`**  
-An optional value of of related parameter of any type.
-
-**Usage:**
-
-```typescript
-// Example usage.
-import { CallbackPayload, ResultCallback } from '@angular-package/callback';
-
-// Create a new function.
-const isString = (
-  value: any,
-
-  // Parameter callback of `ResultCallback` type with the `CallbackPayload`.
-  callback: ResultCallback<CallbackPayload>
-): any => {
-  callback(typeof value === 'string', {
-    // Property from the `CallbackPayload`.
-    action: 'Checks the string of a firstName',
-
-    // Property from the `CallbackPayload`.
-    name: 'isString',
-
-    // Property from the `CallbackPayload`.
-    param: 'value',
-
-    // Property from the `CallbackPayload`.
-    value,
-
-    // Custom property.
-    firstName: 'my Name',
-  });
-};
-
-// The use of the `isString()` function.
-isString('it is a string', (result: boolean, payload) => {
-  if (payload !== undefined) {
-    /*
-    Returns {
-      action: "Checks the string of a firstName",
-      firstName: "my Name",
-      name: "isString",
-      param: "value",
-      value: "it is a string",
-    }
-    */
-    console.log(payload);
-  }
-  return result;
-});
-```
-
-<br>
-
 ## Type
-
-#### `ResultCallback`
-
-Represents a callback function with parameters, a `result` of a [`boolean`][js-boolean] type, and an optional `payload` of a generic type `Payload`.
-
-```typescript
-type ResultCallback<Payload extends object = any> = (
-  result: boolean,
-  payload?: Payload
-) => boolean;
-```
-
-**Generic type variables:**
-
-**`Payload extends object`**  
-The shape of the optional `payload` parameter that is constrained by the [`object`][js-object] type.
-
-**Parameters:**
-
-**`result: boolean`**  
-Result of a [`boolean`][js-boolean] type that is returned. What the result concerns is not specified, so it can be anything - the creator decides.
-
-**`payload?: Payload`**  
-An optional `object` of a generic type `Payload` to provide more data.
-
-**Returns:**
-The return value is a [`boolean`][js-boolean] indicating state of the result of any action.
-
-<br>
 
 #### `ResultHandler`
 
-Function to handle the `result` and optional `payload` of the [`ResultCallback`](#resultcallback) function before its result returns.
+![update]
+
+**Internal** function to handle the arguments of the [`ResultCallback`][package-type-resultcallback] function before its result return.
 
 ```typescript
 type ResultHandler<Payload extends object = any> = (
@@ -924,6 +816,14 @@ type ResultHandler<Payload extends object = any> = (
   payload?: Payload
 ) => void;
 ```
+
+<br>
+
+## Changelog
+
+The **changelog** of this package is based on [*keep a changelog*](https://keepachangelog.com/en/1.0.0/). To read it, click on the [CHANGELOG.md](https://github.com/angular-package/callback/blob/main/CHANGELOG.md) link.
+
+> A changelog is a file which contains a curated, chronologically ordered list of notable changes for each version of a project. - [*keep a changelog*](https://keepachangelog.com/en/1.0.0/)
 
 <br>
 
@@ -1100,6 +1000,7 @@ MIT © angular-package ([license][callback-license])
   <!-- GitHub -->
   [type-github-readme]: https://github.com/angular-package/type#readme
 
+  [package-type-foreachcallback]: https://github.com/angular-package/type#foreachcallback
   [package-type-resultcallback]: https://github.com/angular-package/type#resultcallback
   [package-type-key]: https://github.com/angular-package/type#key
 

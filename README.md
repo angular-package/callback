@@ -116,7 +116,7 @@ import {
 
 ## `Callback`
 
-Manages the callback [`function`][js-function] of a [`ResultCallback`][package-type-resultcallback] type.
+Manages the callback [`function`][js-function] of [`ResultCallback`][package-type-resultcallback] and [`ForEachCallback`][package-type-foreachcallback] type.
 
 <br>
 
@@ -695,6 +695,7 @@ The **return value** is the callback [`function`][js-function] of the [`ForEachC
 ```typescript
 // Example usage.
 import { Callback } from '@angular-package/callback';
+
 // Initialize `Callback`.
 const callback = new Callback('firstName');
 
@@ -815,6 +816,7 @@ The **return value** is the callback [`function`][js-function] of the [`ResultCa
 ```typescript
 // Example usage.
 import { Callback } from '@angular-package/callback';
+
 // Initialize `Callback`.
 const callback = new Callback('firstName');
 
@@ -857,39 +859,6 @@ const firstNameCallback = callbackInstance.getResultCallback<
 
 // Use the defined callback function with a defined `CustomPayload`.
 firstNameCallback(false, 5, { id: 5, name: 'there is no name', age: 1 }); // TypeError because of the `age`
-```
-
-```typescript
-// Captured payload example usage.
-import { Callback } from '@angular-package/callback';
-
-// Initialize `Callback`.
-const callbackInstance = new Callback('firstName');
-
-// Define constant from which is going to be captured type for the `Payload`.
-const payLoadToCapture = { id: 1, name: '' };
-
-// Set the callback function of `ResultCallback` under the 'firstName' name.
-callbackInstance.setResultCallback(
-  'firstName',
-  (result, value, payload) => {
-    if (payload) {
-      // It handles two properties from the payload.
-      // payload.id
-      // payload.name
-    }
-  },
-  payLoadToCapture
-);
-
-// Get the function of the `ResultCallback` type stored under the 'firstName' name.
-const firstNameCallback = callbackInstance.getResultCallback(
-  'firstName',
-  payLoadToCapture
-);
-
-// Use the defined callback with a captured type of payload.
-firstNameCallback(false, { id: 5, name: 'there is no name' });
 ```
 
 <br>
@@ -959,6 +928,29 @@ const callback = new Callback('firstName', 'lastName');
 
 // Set the error callback function of the `ResultCallback` type under the 'lastName' name.
 callback.setErrorCallback('lastName', 'LastName must be a string type', false);
+```
+
+```typescript
+// Example usage.
+import { Callback } from '@angular-package/callback';
+
+// Initialize `Callback`.
+const callback = new Callback('firstName', 'lastName');
+
+// Set the error callback function of the `ResultCallback` type under the 'lastName' name.
+callback.setErrorCallback(
+  'lastName',
+  'LastName must be a string type',
+  false,
+  (result, value, payload) => {
+    payload?.field // Returns 'lastName'
+    payload // Returns {moreField: true, field: 'lastName'}
+  },
+  { field: 'lastName' }
+);
+
+// Execute stored callback function.
+callback.getResultCallback('lastName')(true, 'my name', { moreField: true });
 ```
 
 <br>
@@ -1038,7 +1030,7 @@ checkAddress.setForEachCallback(
   'city',
   (result, value, index, array, addresses) =>
     result === false ? console.log(value) : console.log(value),
-  database[0]
+  database
 );
 
 // Execute the check.
@@ -1113,19 +1105,21 @@ callback.setResultCallback('firstName', result => result);
 ```
 
 ```typescript
-// Generic type variable `Payload` example usage.
+// Generic type variable `Value` and `Payload` example usage.
 import { Callback } from '@angular-package/callback';
 
 // Initialize `Callback`.
-const callbackInstance = new Callback('firstName');
+const callback = new Callback('firstName');
 
 // Type for the `Payload`.
 type CustomPayload = { id: number; name: string };
 
 // Set the callback function under the given name.
-callbackInstance.setResultCallback<CustomPayload>(
+callback.setResultCallback<string, CustomPayload>(
   'firstName',
-  (result, payload) => {
+  (result, value, payload) => {
+    result // boolean type
+    value // string type
     if (payload) {
       // It handles two properties from the payload.
       // payload.id
@@ -1140,15 +1134,15 @@ callbackInstance.setResultCallback<CustomPayload>(
 import { Callback } from '@angular-package/callback';
 
 // Initialize `Callback`.
-const callbackInstance = new Callback('firstName');
+const callback = new Callback('firstName');
 
 // Constant from which is going to be captured type for the `Payload`.
 const payLoadToCapture = { id: 1, name: '' };
 
 // Set the callback function under the given name.
-callbackInstance.setResultCallback(
+callback.setResultCallback(
   'firstName',
-  (result, payload) => {
+  (result, value, payload) => {
     if (payload) {
       // It handles two properties from the payload.
       // payload.id
@@ -1157,67 +1151,6 @@ callbackInstance.setResultCallback(
   },
   payLoadToCapture
 );
-```
-
-**Usage examples:**
-
-```typescript
-// Generic type variable `Payload` example usage.
-import { Callback } from '@angular-package/callback';
-
-// Initialize `Callback`.
-const callbackInstance = new Callback('firstName');
-
-// Type for the `Payload`.
-type CustomPayload = { id: number, name: string };
-
-// Set the callback function under the given name.
-callbackInstance.setResultCallback<CustomPayload>('firstName', (result, payload) => {
-  if (payload) {
-    // It handles two properties from the payload.
-    // payload.id
-    // payload.name
-  }
-});
-
-// Get the function stored under the given name with the `CustomPayload` type.
-const firstNameCallback = callbackInstance.getResultCallback<CustomPayload>('firstName');
-
-// Use the defined callback function with a defined `CustomPayload`.
-firstNameCallback(false, { id: 5, name: 'there is no name', age: 1 }); // TypeError because of the `age`
-```
-
-```typescript
-// Captured `Payload` example usage.
-import { Callback } from '@angular-package/callback';
-
-// Initialize `Callback`.
-const callbackInstance = new Callback('firstName');
-
-// Constant from which is going to be captured type for the `Payload`.
-const payLoadToCapture = { id: 1, name: '' };
-
-// Set the callback function under the given name.
-callbackInstance.setResultCallback(
-  'firstName',
-  (result, payload) => {
-    if (payload) {
-      // It handles two properties from the payload.
-      // payload.id
-      // payload.name
-    }
-  },
-  payLoadToCapture
-);
-
-// Get the function stored under the given name.
-const firstNameCallback = callbackInstance.getCallback(
-  'firstName',
-  payLoadToCapture
-);
-
-// Use the defined callback with a captured type of `Payload`.
-firstNameCallback(false, { id: 5, name: 'there is no name' });
 ```
 
 <br>

@@ -1,18 +1,23 @@
 // @angular-package/type.
 import {
-  // Object.
-  is,
-  guard,
+  // Function.
+  guardArray,
+  guardFunction,
+  guardString,
+  isFalse,
+  isFunction,
+  isInstance,
+  isTrue,
+  // Type.
+  ForEachCallback,
+  ResultCallback,
 } from '@angular-package/type';
-// @angular-package/error
+// @angular-package/error.
 import { ErrorMessage, ValidationError } from '@angular-package/error';
-// Interface.
-import { CallbackStorage } from '../interface/callback-storage.interface';
 // Type.
-import { ResultCallback } from '../type/result-callback.type';
 import { ResultHandler } from '../type/result-handler.type';
 /**
- * Manages the callback function of a `ResultCallback` type.
+ * Manages the callback function of a `ResultCallback` and `ForEachCallback` type.
  */
 export class Callback<AllowNames extends string> {
   //#region private properties
@@ -29,156 +34,233 @@ export class Callback<AllowNames extends string> {
 
   //#region static methods
   /**
-   * Defines the `function` of `ResultCallback` type that contains a `ResultHandler` function to handle the `result` and optional
-   * `payload`.
-   * @var Payload The shape of the optional payload parameter of the `ResultCallback` and `ResultHandler` function, which is constrained by
-   * the `object` type. Its value can be captured from a type of the provided `capturePayload` optional parameter.
-   * @param resultHandler The `function` that is guarded by the `ResultHandler` type to handle the result and optional payload of the
-   * `ResultCallback` function.
-   * @param capturePayload An optional `object` of generic type `Payload` that is used only to capture the value by the generic type
-   * variable `Payload`.
-   * @returns The return value is a function of a `ResultCallback` type that contains a function that handles its result.
+   * Defines callback `function` of `ResultCallback` type to throw `ValidationError` with a specified `message` on a state from the supplied
+   * `throwOnState`. The provided `result`, `value`, and `payload` from the defined callback `function` of `ResultCallback` is being passed
+   * to a thrown error of `ValidationError`.
+   * @param message The message of `string` type or `ErrorMessage` interface to throw with an error of `ValidationError`.
+   * @param throwOnState A state of `boolean` type on which an error of `ValidationError` should be thrown. By default, it's set to `false`.
+   * @param resultHandler An optional `function` of `ResultHandler` type to inject into returned callback function of `ResultCallback` type
+   * in order to execute it before the thrown error.
+   * @param defaultPayload An optional `object` of generic type variable `Payload` as the default `value` of `payload` parameter of
+   * `ResultHandler` function from the supplied `resultHandler` parameter.
+   * @returns The return value is a function of a `ResultCallback` type that throws a `ValidationError`.
    */
-  static defineResultCallback<Payload extends object>(
-    resultHandler: ResultHandler<Payload>,
-    capturePayload?: Payload
-  ): ResultCallback<Payload> {
-    return (result: boolean, payload?: Payload) => {
-      if (is.function(resultHandler)) {
-        resultHandler(result, payload);
+  static defineErrorCallback<Value = any, Payload extends object = object>(
+    message: string | ErrorMessage,
+    throwOnState: boolean = false,
+    resultHandler?: ResultHandler<Value, Payload>,
+    defaultPayload?: Payload
+  ): ResultCallback<Value, Payload> {
+    return Callback.defineResultCallback((result, value, payload): void => {
+      if (isFunction(resultHandler)) {
+        resultHandler(result, value, payload);
       }
-      return result;
-    };
+      if (isFalse(throwOnState) ? isFalse(result) : isTrue(result)) {
+        throw Object.assign(new ValidationError(message), {
+          result,
+          value,
+          payload,
+        });
+      }
+    }, defaultPayload);
   }
 
   /**
-   * Defines `function` of `ResultCallback` type to throw `ValidationError` with a specified `message` on a state from `throwOnState`.
-   * Provided `payload` from defined callback function of `ResultCallback` is being passed to a thrown error of `ValidationError`.
-   * @param message The message of `string` type or `ErrorMessage` interface to throw with an error of `ValidationError`.
-   * @param throwOnState A state of `boolean` type on which an error of `ValidationError` should be thrown. By default, it's set to `false`.
-   * @param capturePayload An optional `object` of generic type `Payload` that is used only to capture the value by the generic type
-   * variable `Payload`.
-   * @returns The return value is a function of a `ResultCallback` type that throws a `ValidationError`.
+   * Defines callback function of `ForEachCallback` type to handle `forEach()` method of functions prefixed with `are` from
+   * `@angular-package/type'.
+   * @param forEachCallback The `function` of `ForEachCallback` type to define.
+   * @param defaultPayload An optional `object` of a generic type variable `Payload` as the default `value` of `payload` parameter of the
+   * returned `ForEachCallback` function.
+   * @returns The return value is a `function` of the `ForEachCallback` type.
+   * @angularpackage
    */
-  static defineErrorCallback<Payload extends object>(
-    message: string | ErrorMessage,
-    throwOnState: boolean = false,
-    capturePayload?: Payload
-  ): ResultCallback<Payload> {
-    return Callback.defineResultCallback<Payload>(
-      (result: boolean, payload?: Payload): void => {
-        if (is.false(throwOnState) ? is.false(result) : is.true(result)) {
-          throw Object.assign(new ValidationError(message), { payload });
-        }
-      }
+  static defineForEachCallback<Value = any, Payload extends object = object>(
+    forEachCallback: ForEachCallback<Value, Payload>,
+    defaultPayload?: Payload
+  ): ForEachCallback<Value, Payload> {
+    return (result, value, index, array, payload) =>
+      forEachCallback(result, value, index, array, {
+        ...payload,
+        ...defaultPayload,
+      } as any);
+  }
+
+  /**
+   * Defines callback `function` of `ResultCallback` type that contains a `ResultHandler` function to handle the `result`, `value`, and
+   * optional `payload` without returning the `result`.
+   * @param resultHandler The `function` of `ResultHandler` type to inject into returned callback function of `ResultCallback` type.
+   * @param defaultPayload An optional `object` of generic type variable `Payload` as the default `value` of `payload` parameter of the
+   * returned `ResultCallback` function.
+   * @returns The return value is a `function` of the `ResultCallback` type that contains the given `function` of `ResultHandler` type.
+   * @angularpackage
+   */
+  static defineResultCallback<Value = any, Payload extends object = object>(
+    resultHandler: ResultHandler<Value, Payload>,
+    defaultPayload?: Payload
+  ): ResultCallback<Value, Payload> {
+    return (result, value, payload) => (
+      resultHandler(result, value, {
+        ...payload,
+        ...defaultPayload,
+      } as Payload),
+      result
     );
   }
 
   /**
    * Guards provided `resultCallback` to be `ResultCallback` type.
-   * @param resultCallback The function of `ResultCallback` type with the shape of payload from the generic variable `Payload` to guard.
+   * @param resultCallback The function of `ResultCallback` type to guard.
    * @returns The return value is a `boolean` indicating whether the provided `resultCallback` parameter is a `function`.
    */
-  static guard<Payload extends object>(
-    resultCallback: ResultCallback<Payload>
-  ): resultCallback is ResultCallback<Payload> {
-    return guard.function(resultCallback);
+  static guard<Value = any, Payload extends object = object>(
+    resultCallback: ResultCallback<Value, Payload>
+  ): resultCallback is ResultCallback<Value, Payload> {
+    return guardFunction(resultCallback);
   }
 
   /**
-   * Checks if the provided `value` is an instance of `Callback` with optional indicating allowed names under which callback functions can
-   * be stored.
+   * Checks if the provided `value` is an instance of `Callback` with optional allowed names under which callback functions can be stored.
    * @param value The `value` of any type to check.
-   * @param allowNames A rest parameter of `AllowNames` that is used only to capture the value by the generic type variable
-   * `AllowNames` to indicate allowed names for the `Callback<AllowNames>` return type.
+   * @param allowNames A rest parameter of a generic type variable `AllowNames` is being used only to capture the type for `AllowNames`
+   * of returned `Callback`.
    * @returns The return value is a `boolean` indicating whether provided `value` is an instance of `Callback`.
    */
   static isCallback<AllowNames extends string>(
     value: any,
     ...allowNames: AllowNames[]
   ): value is Callback<AllowNames> {
-    return is.instance(value, Callback);
+    return isInstance(value, Callback);
   }
   //#endregion
 
   /**
-   * Initialize an instance of a `Callback` with the allowed names under which callback functions can be stored.
-   * @param allowNames A rest parameter of allowed names of a `string` type, under which callback functions can be stored.
+   * Initialize an instance of `Callback` with allowed names under which callback functions can be stored.
+   * @param allowNames A rest parameter of allowed names of `string` type, under which callback functions can be stored. Only those names
+   * given by this parameter are being checked by the `isNameAllowed()` private method.
    */
   constructor(...allowNames: AllowNames[]) {
-    this.#allowedNames = guard.array(allowNames)
+    this.#allowedNames = guardArray(allowNames)
       ? new Set(allowNames)
       : this.#allowedNames;
   }
 
-  //#region instance methods
+  //#region instance public methods
   /**
-   * Gets from the storage specified by-name callback function of a `ResultCallback` type.
-   * @var Payload The shape of the optional payload parameter of the ResultCallback function, which is constrained by the object type.
-   * Its value can be captured from a type of the provided capturePayload optional parameter.
-   * @var Name A generic type variable `Name` constrained by the `AllowNames` indicates the name under which callback function is picked
-   * from the storage. It is linked with the return type `Pick<CallbackStorage, Name>[Name]` that refers exactly to the type, which is
-   * `ResultCallback` of the callback function picked from the storage by `Name`. By default, its value is captured from the provided
-   * `name`.
-   * @param name A `string` type name that is restricted by the `AllowNames` to pick stored callback function.
-   * @param capturePayload An optional `object` of generic type `Payload` that is used only to capture the value by the generic type
-   * variable `Payload`.
-   * @returns The return value is a callback function picked from the storage.
+   * Gets from the storage specified by-name callback `function` of `ForEachCallback` type.
+   * @param name The name of a generic type variable `Name` to get stored callback `function`.
+   * @param capturePayload An optional `object` of generic type variable `Payload` that is used only to capture the value by the generic
+   * type variable `Payload`.
+   * @returns The return value is the callback `function` of the `ForEachCallback` type from the storage.
    */
-  public getCallback<
-    Payload extends object,
+  public getForEachCallback<
+    Value = any,
+    Payload extends object = object,
     Name extends AllowNames = AllowNames
-  >(
-    name: Name,
-    capturePayload?: Payload
-  ): Pick<CallbackStorage<Payload>, Name>[Name] {
+  >(name: Name, capturePayload?: Payload): ForEachCallback<Value, Payload> {
     return this.#storage.get(name);
   }
 
   /**
-   * Sets a callback function of a `ResultCallback` type that throws `ValidationError` with a specified message on a state from the provided
-   * `throwOnState` to the storage under the given allowed name restricted by `AllowNames`.
-   * @param name The name of a `string` type under which the callback `function` is stored.
-   * @param message An error `message` of a `string` type or of an `ErrorMessage` interface for the instance of `ValidationError`.
-   * @returns The return value is an instance of a `Callback`.
+   * Gets from the storage specified by-name callback function of `ResultCallback` type.
+   * @param name The name of generic type variable `Name` to get the stored callback `function`.
+   * @param capturePayload An optional `object` of generic type variable `Payload` that is used only to capture the value by the generic
+   * type variable `Payload`.
+   * @returns The return value is the callback `function` of the `ResultCallback` type from the storage.
    */
-   public setErrorCallback<Name extends AllowNames>(
-    name: Name,
-    message: string | ErrorMessage,
-    throwOnState: boolean = false
-  ): this {
-    this.setResultCallback(
-      name,
-      Callback.defineErrorCallback(message, throwOnState)
-    );
-    return this;
+  public getResultCallback<
+    Value = any,
+    Payload extends object = object,
+    Name extends AllowNames = AllowNames
+  >(name: Name, capturePayload?: Payload): ResultCallback<Value, Payload> {
+    return this.#storage.get(name);
   }
 
   /**
-   * Sets a callback function of a `ResultCallback` type to the storage under the given allowed `name`, which is restricted by `AllowNames`.
-   * @param name The name of a `string` type under which the callback function is stored. The value is string-guarded and
-   * checked its allowed state.
-   * @param resultHandler The function of `ResultHandler` to handle the result of the `ResultCallback` function before its result returns.
-   * @param capturePayload An optional `object` that is used to capture the type of generic type variable `Payload`.
+   * Sets callback function of `ResultCallback` type that throws `ValidationError` with a specified `message` on a state from the provided
+   * `throwOnState` to the storage under the given allowed `name`.
+   * @param name The name of a generic type variable `Name` under which callback `function` is stored. The allowed status of the provided
+   * `name` is checked by the private method `isNameAllowed()`.
+   * @param message The message of `string` type or an `object` of `ErrorMessage` interface, to throw with an error of `ValidationError`.
+   * @param throwOnState A state of `boolean` type on which an error of `ValidationError` should be thrown. By default, it's set to `false`.
+   * @param defaultPayload An optional `object` of generic type variable `Payload` as the default `value` of `payload` parameter of the
+   * defined `ResultCallback` function.
    * @returns The return value is an instance of `Callback`.
    */
-  public setResultCallback<
-    Payload extends object,
-    Name extends AllowNames = AllowNames
+  public setErrorCallback<
+    Value = any,
+    Payload extends object = object,
+    Name extends AllowNames = AllowNames,
   >(
     name: Name,
-    resultHandler: ResultHandler<Payload>,
-    capturePayload?: Payload
+    message: string | ErrorMessage,
+    throwOnState: boolean = false,
+    resultHandler?: ResultHandler<Value, Payload>,
+    defaultPayload?: Payload
   ): this {
     if (this.isNameAllowed(name)) {
       this.#storage.set(
         name,
-        Callback.defineResultCallback<Payload>(resultHandler)
+        Callback.defineErrorCallback(message, throwOnState, resultHandler, defaultPayload)
       );
     }
     return this;
   }
-  //#endregion
+
+  /**
+   * Sets callback `function` of `ForEachCallback` type to the storage under the given allowed `name`.
+   * @param name The name of a generic type variable `Name` under which callback `function` is stored. The allowed status of the provided
+   * `name` is checked by the private method `isNameAllowed()`.
+   * @param forEachCallback The callback function of `ForEachCallback` type to set under the given `name`.
+   * @param defaultPayload An optional `object` of generic type variable `Payload` as the default value of `payload` parameter of supplied
+   * `forEachCallback` function.
+   * @returns The return value is an instance of `Callback`.
+   */
+  public setForEachCallback<
+    Value = any,
+    Payload extends object = object,
+    Name extends AllowNames = AllowNames
+  >(
+    name: Name,
+    forEachCallback: ForEachCallback<Value, Payload>,
+    defaultPayload?: Payload
+  ): this {
+    if (this.isNameAllowed(name)) {
+      this.#storage.set(
+        name,
+        Callback.defineForEachCallback(forEachCallback, defaultPayload)
+      );
+    }
+    return this;
+  }
+
+  /**
+   * Sets callback `function` of `ResultCallback` type to the storage under the given allowed `name`.
+   * @param name The name of a generic type variable `Name` under which callback `function` is stored. The allowed status of the provided
+   * `name` is checked by the private method `isNameAllowed()`.
+   * @param resultHandler The `function` of `ResultHandler` type to handle the `result`, `value` and optional `payload` of the
+   * `ResultCallback` function without returning the `result`.
+   * @param defaultPayload An optional `object` of generic type variable `Payload` as the default value of `payload` parameter of supplied
+   * `resultHandler` function.
+   * @returns The return value is an instance of `Callback`.
+   */
+  public setResultCallback<
+    Value = any,
+    Payload extends object = object,
+    Name extends AllowNames = AllowNames
+  >(
+    name: Name,
+    resultHandler: ResultHandler<Value, Payload>,
+    defaultPayload?: Payload
+  ): this {
+    if (this.isNameAllowed(name)) {
+      this.#storage.set(
+        name,
+        Callback.defineResultCallback(resultHandler, defaultPayload)
+      );
+    }
+    return this;
+  }
+  //#endregion instance public methods
 
   /**
    * Checks if the provided `name` of a `string` type is the allowed `name` under which the callback function can be stored.
@@ -187,6 +269,6 @@ export class Callback<AllowNames extends string> {
    * function can be stored.
    */
   private isNameAllowed<Name extends AllowNames>(name: Name): boolean {
-    return this.#allowedNames.has(guard.string(name) ? name : '');
+    return this.#allowedNames.has(guardString(name) ? name : '');
   }
 }

@@ -1018,17 +1018,6 @@ The **return value** is an instance of [`Callback`](#callback).
 ```typescript
 // Example usage.
 import { Callback } from '@angular-package/callback';
-
-// Initialize `Callback`.
-const callback = new Callback('firstName', 'lastName');
-
-// Set the error callback function of the `ResultCallback` type under the 'lastName' name.
-callback.setErrorCallback('lastName', 'LastName must be a string type', false);
-```
-
-```typescript
-// Example usage.
-import { Callback } from '@angular-package/callback';
 import { are } from '@angular-package/type';
 
 // Define database with addresses.
@@ -1120,7 +1109,7 @@ import { Callback } from '@angular-package/callback';
 const callback = new Callback('firstName');
 
 // Set the callback function under the given name.
-callback.setCallback('firstName', result => result) 
+callback.setResultCallback('firstName', result => result);
 ```
 
 ```typescript
@@ -1168,10 +1157,9 @@ callbackInstance.setResultCallback(
   },
   payLoadToCapture
 );
-
 ```
 
-**Full usage example:**
+**Usage examples:**
 
 ```typescript
 // Generic type variable `Payload` example usage.
@@ -1193,7 +1181,7 @@ callbackInstance.setResultCallback<CustomPayload>('firstName', (result, payload)
 });
 
 // Get the function stored under the given name with the `CustomPayload` type.
-const firstNameCallback = callbackInstance.getCallback<CustomPayload>('firstName');
+const firstNameCallback = callbackInstance.getResultCallback<CustomPayload>('firstName');
 
 // Use the defined callback function with a defined `CustomPayload`.
 firstNameCallback(false, { id: 5, name: 'there is no name', age: 1 }); // TypeError because of the `age`
@@ -1238,7 +1226,7 @@ firstNameCallback(false, { id: 5, name: 'there is no name' });
 
 #### `ResultHandler`
 
-![update]
+[![update]][callback-github-changelog]
 
 **Internal** function to handle the arguments of the [`ResultCallback`][package-type-resultcallback] function before its result return.
 

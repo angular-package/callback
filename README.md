@@ -328,7 +328,7 @@ static defineForEachCallback<Value = any, Payload extends object = object>(
 | Name: type                                         | Description |
 | :------------------------------------------------- | :---------- |
 | `forEachCallback: ForEachCallback<Value, Payload>` | The [`function`][js-function] of [`ForEachCallback`][package-type-foreachcallback] type to define. |
-| `defaultPayload?: Payload`                         | An optional [`object`][js-object] of a generic type variable `Payload` as the default `value` of `payload` parameter of the returned [`ForEachCallback`][package-type-foreachcallback] function. |
+| `defaultPayload?: Payload`                         | An optional [`object`][js-object] of generic type variable `Payload` as the default `value` of `payload` parameter of the returned [`ForEachCallback`][package-type-foreachcallback] function. |
 
 **Returns:**
 
@@ -360,6 +360,54 @@ are
   // areString() false null 1 (3) ['someone', null, ''] {name: 'no name', database: 'person'}
   // areString() true  2 (3) ['someone', null, ''] {name: 'no name', database: 'person'}
   .forEach(areStringCallback, { name: 'no name' });
+```
+
+```typescript
+// Example usage.
+import { Callback } from '../lib/callback.class';
+import { are, ForEachCallback } from '@angular-package/type';
+
+// Example usage in the `class`.
+class Person {
+  #callback!: Callback<'check'>;
+
+  #persons: Array<{ checked: boolean; name: string }> = [
+    { checked: false, name: 'Someone' },
+    { checked: false, name: undefined as any },
+    { checked: true, name: 'Someone' },
+  ];
+
+  constructor(handleCallback: Callback<'check'>) {
+    if (handleCallback) {
+      this.#callback = handleCallback;
+    }
+  }
+
+  public check(
+    callbackFn: ForEachCallback = this.#callback.getForEachCallback('check')
+  ): this {
+    are
+      .true(...this.#persons.map((v) => v.checked))
+      .forEach(callbackFn, this.#persons);
+    return this;
+  }
+}
+
+// Initialize default callbacks.
+const defaultCallbacks = new Callback('check').setForEachCallback<boolean, any>(
+  'check',
+  (result, value, index, array, persons) => {
+    if (result === true) {
+      // Console returns 2 true {checked: true, name: 'Someone'}
+      console.log(index, result, persons[index]);
+    } else {
+      persons[index].checked = true;
+    }
+  }
+);
+
+// Inject `defaultCallbacks` into instance of `Person` and set `checked` to `true` if `false` by using `check()` method.
+new Person(defaultCallbacks).check();
 ```
 
 <br>
@@ -577,13 +625,13 @@ new Callback<AllowNames extends string>(...allowNames: AllowNames[]) {
 
 | Name         |  Default value        | Description |
 | :----------- | :-------------------: |:----------- |
-| `AllowNames` | [`string`][ts-string] | A generic type variable of `AllowNames` name constrained by the [`string`][js-string] type that is used to **restrict** allowed names under which callback functions can be stored via the return type `value is Callback<AllowNames>`. Its value is captured from the provided `allowNames` rest parameter. |
+| `AllowNames` | [`string`][ts-string] | A generic type variable of `AllowNames` name constrained by [`string`][js-string] type that is used to **restrict** allowed names under which callback functions can be stored. Its value **must be** captured from the provided `allowNames` rest parameter to work properly with `isNameAllowed()` private method. |
 
 **Parameters:**
 
 | Name: type                   | Description |
 | :--------------------------- | :---------- |
-| `allowNames: AllowedNames[]` | A [rest parameter][js-rest-parameter] of a [`string`][js-string] type allowed names under which callback functions can be stored. Only those names given by this parameter are being checked by the `isNameAllowed()` private method. |
+| `allowNames: AllowedNames[]` | A [rest parameter][js-rest-parameter] of [`string`][js-string] type allowed names under which callback functions can be stored. Only those names given by this parameter are being checked by the `isNameAllowed()` private method. |
 
 **Returns:**
 
@@ -631,7 +679,7 @@ public getForEachCallback<
 
 | Name: type                 | Description |
 | :------------------------- | :---------- |
-| `name: Name`               | The name of a generic type variable `Name` to pick the stored callback [`function`][js-function]. |
+| `name: Name`               | The name of a generic type variable `Name` to get stored callback [`function`][js-function]. |
 | `capturePayload?: Payload` | An optional [`object`][js-object] of generic type variable `Payload` that is used only to capture the value by the generic type variable `Payload`. |
 
 **Returns:**
@@ -640,7 +688,7 @@ public getForEachCallback<
 | :-------------------------------- | :-----------------------: | :---------- |
 | `ForEachCallback<Value, Payload>` | [`function`][ts-function] | The **return type** is [`ForEachCallback`][package-type-foreachcallback] [`function`][ts-function]. |
 
-The **return value** is the callback [`function`][js-function] of the [`ForEachCallback`][package-type-foreachcallback] type picked from the storage.
+The **return value** is the callback [`function`][js-function] of the [`ForEachCallback`][package-type-foreachcallback] type from the storage.
 
 **Usage:**
 
@@ -751,7 +799,7 @@ public getResultCallback<
 
 | Name: type                 | Description |
 | :------------------------- | :---------- |
-| `name: Name`               | The name of a generic type variable `Name` to pick the stored callback [`function`][js-function]. |
+| `name: Name`               | The name of a generic type variable `Name` to get the stored callback [`function`][js-function]. |
 | `capturePayload?: Payload` | An optional [`object`][js-object] of generic type variable `Payload` that is used only to capture the value by the generic type variable `Payload`. |
 
 **Returns:**
@@ -760,7 +808,7 @@ public getResultCallback<
 | :------------------------------- | :-----------------------: | :---------- |
 | `ResultCallback<Value, Payload>` | [`function`][ts-function] | The **return type** is [`ResultCallback`][package-type-resultcallback] [`function`][ts-function]. |
 
-The **return value** is the callback [`function`][js-function] of the [`ResultCallback`][package-type-resultcallback] type picked from the storage.
+The **return value** is the callback [`function`][js-function] of the [`ResultCallback`][package-type-resultcallback] type from the storage.
 
 **Usage:**
 
@@ -850,18 +898,24 @@ firstNameCallback(false, { id: 5, name: 'there is no name' });
 
 [![update]][callback-github-changelog]
 
-Sets callback [`function`][js-function] of [`ResultCallback`][package-type-resultcallback] type that throws [`ValidationError`][error-validationerror] with a specified `message` on a state from the provided `throwOnState` to the storage under the given allowed `name` restricted by generic type variable `AllowNames`.
+Sets callback [`function`][js-function] of [`ResultCallback`][package-type-resultcallback] type that throws [`ValidationError`][error-validationerror] with a specified `message` on a state from the provided `throwOnState` to the storage under the given allowed `name`.
 
 ```typescript
-public setErrorCallback<Name extends AllowNames>(
+public setErrorCallback<
+  Value = any,
+  Payload extends object = object,
+  Name extends AllowNames = AllowNames,
+>(
   name: Name,
   message: string | ErrorMessage,
-  throwOnState: boolean = false
+  throwOnState: boolean = false,
+  resultHandler?: ResultHandler<Value, Payload>,
+  defaultPayload?: Payload
 ): this {
   if (this.isNameAllowed(name)) {
     this.#storage.set(
       name,
-      Callback.defineErrorCallback(message, throwOnState)
+      Callback.defineErrorCallback(message, throwOnState, resultHandler, defaultPayload)
     );
   }
   return this;
@@ -870,17 +924,21 @@ public setErrorCallback<Name extends AllowNames>(
 
 **Generic type variables:**
 
-| Name   | Default value | Description |
-| :----- | :-----------: | :---------- |
-| `Name` | `AllowNames`  | A generic type variable `Name` constrained by generic type variable `AllowNames`, captured from supplied `name` indicates the name under which callback [`function`][ts-function] is stored. |
+| Name      | Default value         | Description |
+| :-------- | :-------------------: | :---------- |
+| `Value`   | [`any`][ts-any]       | A generic type variable `Value` by default equal to [`any`][ts-any] determines the type of the `value` parameter of [`ResultHandler`](#resulthandler) function from optional supplied `resultHandler` parameter. |
+| `Payload` | [`object`][ts-object] | The shape of the optional `payload` parameter of [`ResultHandler`](#resulthandler) function from optional supplied `resultHandler` parameter, constrained by the [`object`][ts-object] type. Its value **can be** captured from a type of the provided `defaultPayload` optional parameter. |
+| `Name`    | `AllowNames`          | A generic type variable `Name` constrained by generic type variable `AllowNames`, captured from supplied `name` indicates the name under which callback [`function`][ts-function] is stored. |
 
 **Parameters:**
 
-| Name: type                        | Description |
-| :-------------------------------- | :---------- |
-| `name: Name`                      | The name of a generic type variable `Name` under which callback [`function`][js-function] is stored. The allowed status of the provided `name` is checked by the private method `isNameAllowed()`.|
-| `message: string \| ErrorMessage` | The message of [`string`][js-string] type or [`ErrorMessage`](#errormessage) interface, to throw with an error of [`ValidationError`][error-validationerror]. |
-| `throwOnState: boolean`           | A state of [`boolean`][js-boolean] type on which an error of [`ValidationError`][error-validationerror] should be thrown. By default, it's set to `false`. |
+| Name: type                                      | Description |
+| :---------------------------------------------- | :---------- |
+| `name: Name`                                    | The name of a generic type variable `Name` under which callback [`function`][js-function] is stored. The allowed status of the provided `name` is checked by the private method `isNameAllowed()`.|
+| `message: string \| ErrorMessage`               | The message of [`string`][js-string] type or [`ErrorMessage`](#errormessage) interface, to throw with an error of [`ValidationError`][error-validationerror]. |
+| `throwOnState: boolean`                         | A state of [`boolean`][js-boolean] type on which an error of [`ValidationError`][error-validationerror] should be thrown. By default, it's set to `false`. |
+| `resultHandler?: ResultHandler<Value, Payload>` | An optional [`function`][js-function] of [`ResultHandler`](#resulthandler) type to inject into returned callback function of [`ResultCallback`][package-type-resultcallback] type in order to execute it before the thrown error. |
+| `defaultPayload?: Payload`                      | An optional [`object`][js-object] of generic type variable `Payload` as the default `value` of `payload` parameter of returned [`ResultCallback`][package-type-resultcallback] function and [`ResultHandler`](#resulthandler) function from the supplied `resultHandler` parameter. |
 
 **Returns:**
 
@@ -909,7 +967,7 @@ callback.setErrorCallback('lastName', 'LastName must be a string type', false);
 
 [![new]][callback-github-changelog]
 
-Sets callback [`function`][js-function] of `ForEachCallback` type to the storage under the given allowed `name` restricted by generic type variable `AllowNames`.
+Sets callback [`function`][js-function] of [`ForEachCallback`][package-type-foreachcallback] type to the storage under the given allowed `name`.
 
 ```typescript
 public setForEachCallback<
@@ -968,13 +1026,45 @@ const callback = new Callback('firstName', 'lastName');
 callback.setErrorCallback('lastName', 'LastName must be a string type', false);
 ```
 
+```typescript
+// Example usage.
+import { Callback } from '@angular-package/callback';
+import { are } from '@angular-package/type';
+
+// Define database with addresses.
+const database = [
+  { city: 'New York', postCode: 1 },
+  { city: 'Warsaw', postCode: 2 },
+  { city: 'London', postCode: 3 },
+  { city: undefined, postCode: 4 },
+  { city: null, postCode: 6 },
+  { city: 'San Francisco', postCode: 5 },
+];
+
+// Define callback for `are` checking functions.
+const checkAddress = new Callback('city');
+
+// Set callback function for checking the city against the string type.
+checkAddress.setForEachCallback(
+  'city',
+  (result, value, index, array, addresses) =>
+    result === false ? console.log(value) : console.log(value),
+  database[0]
+);
+
+// Execute the check.
+are
+  .string(...database.map((v) => v.city))
+  .forEach(checkAddress.getForEachCallback('city'), database);
+```
+
 <br>
 
 #### `Callback.prototype.setResultCallback()`
 
 [![update]][callback-github-changelog]
 
-Sets callback `function` of [`ResultCallback`][package-type-resultcallback] type to the storage under the given allowed `name` restricted by generic type variable `AllowNames`.
+Sets callback `function` of [`ResultCallback`][package-type-resultcallback] type to the storage under the given allowed `name`.
 
 ```typescript
 public setResultCallback<

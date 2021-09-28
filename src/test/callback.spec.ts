@@ -1,7 +1,7 @@
+// @angular-package/type.
+import { are, is, ForEachCallback, ResultCallback } from '@angular-package/type';
 // @angular-package/testing.
 import { Testing, TestingToBeMatchers } from '@angular-package/testing';
-// @angular-package/type.
-import { is } from '@angular-package/type';
 /**
  * ValidationError
  */
@@ -10,9 +10,7 @@ import { ValidationError } from '@angular-package/error';
  * Callback.
  */
 import { Callback } from '../lib/callback.class';
-// Type
-import { ResultCallback } from '../type/result-callback.type';
- // Constants.
+// Constants.
 import {
   TESTING_FALSE,
   TESTING_OBJECT,
@@ -52,39 +50,9 @@ testing.describe(Callback.name, () => {
     );
 
   //#region Callback static methods
-  // Callback.defineResultCallback()
-  testing.describe(`.defineResultCallback()`, () => {
-    let stringCallback: ResultCallback;
-    testing.it('defining `ResultCallback` properly', () => {
-      stringCallback = Callback.defineResultCallback(
-        (result: boolean, payload) => {
-          if (is.false(result)) {
-            throw new ValidationError(`It's not a string type, got ${payload}`);
-          }
-        }
-      );
-      toBe.function(stringCallback);
-      try {
-        is.string(5, stringCallback);
-      } catch (e) {
-        if (e instanceof ValidationError) {
-          toBe.string(e.message);
-          console.log(e.message);
-          expect(e.message).toEqual(`It's not a string type, got 5`);
-        }
-      }
-    });
-
-    testing.it('defining `ResultCallback` not properly', () => {
-      const falseCallback: any = false;
-      stringCallback = Callback.defineResultCallback(falseCallback);
-      toBe.function(stringCallback).false(is.string(5, stringCallback));
-    });
-  });
-
   // Callback.defineErrorCallback()
   testing.describe(`.defineErrorCallback()`, () => {
-    let stringErrorCallback: ResultCallback;
+    let stringErrorCallback: ResultCallback | undefined;
     const problem = 'Value is not a string';
     const fix = 'Provide proper type';
     testing.it(
@@ -110,6 +78,60 @@ testing.describe(Callback.name, () => {
         stringErrorCallback = Callback.defineErrorCallback({ problem, fix });
       }
     );
+  });
+
+  // Callback.defineForEachCallback()
+  testing.describe(`.()`, () => {
+    let forEachCallback: ForEachCallback;
+    testing.it('defining `defineForEachCallback` properly', () => {
+      forEachCallback =  Callback.defineForEachCallback(
+        (result: boolean, payload) => {
+          if (is.false(result)) {
+            throw new ValidationError(`It's not a string type, got ${payload}`);
+          }
+        }
+      );
+      toBe.function(forEachCallback);
+      try {
+        are.string(5, '6', 7).forEach(forEachCallback);
+      } catch (e) {
+        if (e instanceof ValidationError) {
+          toBe.string(e.message);
+          console.log(e.message);
+          expect(e.message).toEqual(`It's not a string type, got 5`);
+        }
+      }
+    });
+  });
+
+  // Callback.defineResultCallback()
+  testing.describe(`.defineResultCallback()`, () => {
+    let stringCallback: ResultCallback | undefined;
+    testing.it('defining `ResultCallback` properly', () => {
+      stringCallback = Callback.defineResultCallback(
+        (result: boolean, payload) => {
+          if (is.false(result)) {
+            throw new ValidationError(`It's not a string type, got ${payload}`);
+          }
+        }
+      );
+      toBe.function(stringCallback);
+      try {
+        is.string(5, stringCallback);
+      } catch (e) {
+        if (e instanceof ValidationError) {
+          toBe.string(e.message);
+          console.log(e.message);
+          expect(e.message).toEqual(`It's not a string type, got 5`);
+        }
+      }
+    });
+
+    testing.it('defining `ResultCallback` not properly', () => {
+      const falseCallback: any = false;
+      // stringCallback = Callback.defineResultCallback(falseCallback);
+      // toBe.not.function(stringCallback);
+    });
   });
 
   // Callback.guard()
@@ -147,21 +169,21 @@ testing.describe(Callback.name, () => {
       const callbacks = new Callback('isString', 'isNumber');
       testing.it('with allowedNames', () => {
         toBe
-          .undefined(callbacks.getCallback('isString'))
-          .undefined(callbacks.getCallback('isNumber'));
+          .undefined(callbacks.getResultCallback('isString'))
+          .undefined(callbacks.getResultCallback('isNumber'));
 
         callbacks
           .setResultCallback('isString', (result: boolean) => result)
           .setResultCallback('isNumber', (result: boolean) => result);
         toBe
-          .function(callbacks.getCallback('isString'))
-          .function(callbacks.getCallback('isNumber'));
+          .function(callbacks.getResultCallback('isString'))
+          .function(callbacks.getResultCallback('isNumber'));
       });
 
       testing.it('and cannot set function with not allowed `firstName`', () => {
         const storageName: any = 'firstName';
         callbacks.setResultCallback(storageName, (result) => result);
-        toBe.undefined(callbacks.getCallback(storageName));
+        toBe.undefined(callbacks.getResultCallback(storageName));
       });
     });
   });
@@ -169,7 +191,7 @@ testing.describe(Callback.name, () => {
   //#region Callback public methods
   testing.describe(`.prototype.getCallback()`, () => {
     try {
-      is.string(5, callback.getCallback('setCallback'));
+      is.string(5, callback.getResultCallback('setCallback'));
     } catch (e) {
       if (e instanceof ValidationError) {
         toBe.string(e.message);
@@ -182,9 +204,9 @@ testing.describe(Callback.name, () => {
     const message = 'This is test error';
     testing.it('properly working with message of a string type', () => {
       callback.setErrorCallback('setCallback', message, false);
-      toBe.function(callback.getCallback('setCallback'));
+      toBe.function(callback.getResultCallback('setCallback'));
       try {
-        is.string(5, callback.getCallback('setCallback'));
+        is.string(5, callback.getResultCallback('setCallback'));
       } catch (e) {
         if (e instanceof ValidationError) {
           expect(e.message).toEqual(message);
@@ -203,9 +225,9 @@ testing.describe(Callback.name, () => {
         },
         true
       );
-      toBe.function(callback.getCallback('setCallback'));
+      toBe.function(callback.getResultCallback('setCallback'));
       try {
-        is.string('5', callback.getCallback('setCallback'));
+        is.string('5', callback.getResultCallback('setCallback'));
       } catch (e) {
         if (e instanceof ValidationError) {
           expect(e.fix).toEqual('No fix for this error');
@@ -224,13 +246,18 @@ testing.describe(Callback.name, () => {
     testing.it(
       'should properly sets the callback function under the `setCallback` name',
       () => {
-        toBe.undefined(callback.getCallback('setCallback'));
-        callback.setResultCallback('setCallback', (result: boolean, value: any) => {
-          if (is.false(result)) {
-            throw new ValidationError('The given value must be a string type');
+        toBe.undefined(callback.getResultCallback('setCallback'));
+        callback.setResultCallback(
+          'setCallback',
+          (result: boolean, value: any) => {
+            if (is.false(result)) {
+              throw new ValidationError(
+                'The given value must be a string type'
+              );
+            }
           }
-        });
-        toBe.function(callback.getCallback('setCallback'));
+        );
+        toBe.function(callback.getResultCallback('setCallback'));
       }
     );
   });

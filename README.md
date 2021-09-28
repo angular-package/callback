@@ -125,7 +125,7 @@ Manages the callback [`function`][js-function] of a [`ResultCallback`][package-t
 | Callback.                                                   | Description |
 | :---------------------------------------------------------- | :---------- |
 | [`defineErrorCallback()`](#callbackdefineerrorcallback)     | Defines callback [`function`][js-function] of [`ResultCallback`][package-type-resultcallback] type to throw [`ValidationError`][error-validationerror] with a specified `message` on a state from the supplied `throwOnState`. |
-| [`defineForEachCallback()`](#callbackdefineforeachcallback) | Defines callback [`function`][js-function] of [`ForEachCallback`][package-type-foreachcallback] type to handle `forEach()` method of functions prefixed with `are` from `@angular-package/type`. |
+| [`defineForEachCallback()`](#callbackdefineforeachcallback) | Defines callback [`function`][js-function] of [`ForEachCallback`][package-type-foreachcallback] type to handle `forEach()` method of functions prefixed with `are` from [`@angular-package/type`][type-npm-readme]. |
 | [`defineResultCallback()`](#callbackdefineresultcallback)   | Defines callback [`function`][js-function] of [`ResultCallback`][package-type-resultcallback] type that contains [`ResultHandler`](#resulthandler) function to handle the `result`, `value`, and optional `payload` without returning the `result`. |
 | [`guard()`](#callbackguard)                                 | Guards the provided `resultCallback` to be [`ResultCallback`][package-type-resultcallback] type. |
 | [`isCallback()`](#callbackiscallback)                       | Checks if the provided `value` is an instance of [`Callback`](#callback) with optional allowed names under which callback functions can be stored. |
@@ -160,15 +160,19 @@ Manages the callback [`function`][js-function] of a [`ResultCallback`][package-t
 
 [![update]][callback-github-changelog]
 
-Defines callback [`function`][js-function] of [`ResultCallback`][package-type-resultcallback] type to throw [`ValidationError`][error-validationerror] with a specified `message` on a state from the supplied `throwOnState`. The provided `result`, `value`, and `payload` from the defined callback function of [`ResultCallback`][package-type-resultcallback] is being passed to a thrown error of [`ValidationError`][error-validationerror].
+Defines callback [`function`][js-function] of [`ResultCallback`][package-type-resultcallback] type to throw [`ValidationError`][error-validationerror] with a specified `message` on a state from the supplied `throwOnState`. The provided `result`, `value`, and `payload` from the defined callback function of [`ResultCallback`][package-type-resultcallback] are being passed to a thrown error of [`ValidationError`][error-validationerror].
 
 ```typescript
 static defineErrorCallback<Value = any, Payload extends object = object>(
   message: string | ErrorMessage,
   throwOnState: boolean = false,
+  resultHandler?: ResultHandler<Value, Payload>,
   defaultPayload?: Payload
 ): ResultCallback<Value, Payload> {
   return Callback.defineResultCallback((result, value, payload): void => {
+    if (isFunction(resultHandler)) {
+      resultHandler(result, value, payload);
+    }
     if (isFalse(throwOnState) ? isFalse(result) : isTrue(result)) {
       throw Object.assign(new ValidationError(message), {
         result,
@@ -189,11 +193,12 @@ static defineErrorCallback<Value = any, Payload extends object = object>(
 
 **Parameters:**
 
-| Name: type                        | Description |
-| :-------------------------------- | :---------- |
-| `message: string \| ErrorMessage` | The message of [`string`][js-string] type or [`ErrorMessage`](#errormessage) interface to throw with an error of [`ValidationError`][error-validationerror]. |
-| `throwOnState: boolean`           | A state of [`boolean`][js-boolean] type on which an error of [`ValidationError`][error-validationerror] should be thrown. By default, it's set to `false`. |
-| `defaultPayload?: Payload`        | An optional [`object`][js-object] of generic type variable `Payload` as the default `value` of `payload` parameter of the returned [`ResultCallback`][package-type-resultcallback] function. |
+| Name: type                                      | Description |
+| :---------------------------------------------- | :---------- |
+| `message: string \| ErrorMessage`               | The message of [`string`][js-string] type or [`ErrorMessage`](#errormessage) interface to throw with an error of [`ValidationError`][error-validationerror]. |
+| `throwOnState: boolean`                         | A state of [`boolean`][js-boolean] type on which an error of [`ValidationError`][error-validationerror] should be thrown. By default, it's set to `false`. |
+| `resultHandler?: ResultHandler<Value, Payload>` | An optional [`function`][js-function] of [`ResultHandler`](#resulthandler) type to inject into returned callback function of [`ResultCallback`][package-type-resultcallback] type in order to execute it before the thrown error. |
+| `defaultPayload?: Payload`                      | An optional [`object`][js-object] of generic type variable `Payload` as the default `value` of `payload` parameter of [`ResultHandler`](#resulthandler) function from the supplied `resultHandler` parameter. |
 
 **Returns:**
 
@@ -211,10 +216,54 @@ import { Callback } from '@angular-package/callback';
 import { is } from '@angular-package/type';
 
 // Define callback function of `ResultCallback` type for the `is.string()` method.
-const stringCallback = Callback.defineErrorCallback('Something went wrong');
+const stringCallback = Callback.defineErrorCallback(
+  'Something went wrong',
+  false,
+  (result, value, payload) => {
+    // Console returns {field: 'firstName'}
+    console.log(payload);
+  },
+  { field: 'firstName' }
+);
 
-// Throws ValidationError: Something went wrong
+// Uncaught ValidationError: Something went wrong
 is.string(5, stringCallback);
+```
+
+```typescript
+// Example usage.
+import { Callback } from '@angular-package/callback';
+import { is } from '@angular-package/type';
+
+// Define callback function for the `is.string()` method to check `firstName` against string type.
+const isNameCallback = Callback.defineErrorCallback<
+  string,
+  { field?: 'firstName'; age?: number }
+>(
+  'Name must be a string type.',
+  false,
+  (result, value, payload) => {
+    // Console returns {name: 'isFirstName', field: 'firstName'}
+    console.log(payload);
+  },
+  { field: 'firstName' }
+);
+
+// Define `isFirstName()` function to check the string.
+const isFirstName = (value: any, callback = isNameCallback): value is boolean =>
+  is.string(3, callback, { name: 'isFirstName' });
+
+// Uncaught ValidationError: Name must be a string type.
+isFirstName(3);
+
+// Caught ValidationError: Name must be a string type.
+try {
+  isFirstName(3);
+} catch (e) {
+  e.result; // false
+  e.value; // 3
+  e.payload; // {name: 'isFirstName', field: 'firstName'}
+}
 ```
 
 ```typescript
@@ -252,7 +301,7 @@ try {
 
 [![new]][callback-github-changelog]
 
-Defines callback [`function`][js-function] of [`ForEachCallback`][package-type-foreachcallback] type to handle `forEach()` method of functions prefixed with `are` from `@angular-package/type`.
+Defines callback [`function`][js-function] of [`ForEachCallback`][package-type-foreachcallback] type to handle `forEach()` method of functions prefixed with `are` from [`@angular-package/type`][type-npm-readme].
 
 ```typescript
 static defineForEachCallback<Value = any, Payload extends object = object>(
@@ -271,7 +320,7 @@ static defineForEachCallback<Value = any, Payload extends object = object>(
 
 | Name      | Default value         | Description |
 | :-------- | :-------------------: | :---------- |
-| `Value`   | [`any`][ts-any]       | A generic type variable `Value` by default equal to [`any`][ts-any] determines the type of the `value` parameter of the [`ForEachCallback`][package-type-foreachcallback] function in the supplied `forEachCallback` parameter and via the return type. |
+| `Value`   | [`any`][ts-any]       | A generic type variable `Value` by default equal to [`any`][ts-any] determines the type of the `value` parameter of the [`ForEachCallback`][package-type-foreachcallback] function in the supplied `forEachCallback` parameter and return type. |
 | `Payload` | [`object`][ts-object] | The shape of the optional `payload` parameter of the [`ForEachCallback`][package-type-foreachcallback] function of the supplied `forEachCallback` parameter and the return type.  Its value **can be** captured from a type of the provided `defaultPayload` optional parameter. |
 
 **Parameters:**
@@ -279,7 +328,7 @@ static defineForEachCallback<Value = any, Payload extends object = object>(
 | Name: type                                         | Description |
 | :------------------------------------------------- | :---------- |
 | `forEachCallback: ForEachCallback<Value, Payload>` | The [`function`][js-function] of [`ForEachCallback`][package-type-foreachcallback] type to define. |
-| `defaultPayload?: Payload`                         | An optional [`object`][js-object] of a generic type variable `Payload` as the default `value` of `payload` parameter of the returned [`ResultCallback`][package-type-resultcallback] function. |
+| `defaultPayload?: Payload`                         | An optional [`object`][js-object] of a generic type variable `Payload` as the default `value` of `payload` parameter of the returned [`ForEachCallback`][package-type-foreachcallback] function. |
 
 **Returns:**
 
